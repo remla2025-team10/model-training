@@ -8,8 +8,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
 from sklearn.metrics import accuracy_score
 
-VERSION = "0.0.1"  # TODO: automate?
-
 
 def train(data_p, processed_p, bow_p, model_p, bow_max_features):
     """
@@ -58,10 +56,10 @@ def create_arg_parser():
         description='Train a sentiment analysis model with specified data, model, and output paths, and configure the Bag-of-Words vectorizer.')
     parser.add_argument('--data_p', type=str, default='data/a1_RestaurantReviews_HistoricDump.tsv',
                         help='Path of the training data (default: data/a1_RestaurantReviews_HistoricDump.tsv)')
-    parser.add_argument('--model_p', type=str, default=f'model/Classifier_Sentiment_Model_{VERSION}',
-                        help=f'Path to save the trained model (default: model/Classifier_Sentiment_Model_{VERSION})')
-    parser.add_argument('--bow_p', type=str, default=f'model/BoW_Sentiment_Model_{VERSION}.pkl',
-                        help=f'Path to save the BoW dictionary (default: model/BoW_Sentiment_Model_{VERSION}.pkl)')
+    parser.add_argument('--model_p', type=str, default=f'model/Classifier_Sentiment_Model',
+                        help=f'Path to save the trained model (default: model/Classifier_Sentiment_Model)')
+    parser.add_argument('--bow_p', type=str, default=f'model/BoW_Sentiment_Model.pkl',
+                        help=f'Path to save the BoW dictionary (default: model/BoW_Sentiment_Model.pkl)')
     parser.add_argument('--processed_p', type=str, default='data/processed_reviews.csv',
                         help='Path to save the processed reviews (default: data/processed_reviews.csv)')
     parser.add_argument('--bow_max_features', type=int, default=1420,
