@@ -1,0 +1,5 @@
+joblib==1.4.2
+numpy==2.2.5
+pandas==2.2.3
+scikit_learn==1.6.1
+preprocess-sentiment-analysis @ git+https://github.com/remla2025-team10/lib-ml.git@v0.0.3

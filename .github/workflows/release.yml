@@ -1,0 +1,23 @@
+name: Upload Model Files to Release
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+
+jobs:
+  upload:
+    name: Upload model files to release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 📦 Upload models to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            model/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
