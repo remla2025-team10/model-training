@@ -1,4 +1,5 @@
 import joblib
+import argparse
 import pandas as pd
 import pickle
 from preprocess_sentiment_analysis import preprocess_dataframe
@@ -22,9 +23,21 @@ def predict(reviews, vectorizer, classifier, output_path=f'{config.PROCESSED_DAT
 
     return predictions
 
+def create_arg_parser():
+    parser = argparse.ArgumentParser(
+        description='Predict sentiment of reviews using a pre-trained model.')
+    parser.add_argument('--bow_p', type=str, default=str(config.DEFAULT_BOW_MODEL_PATH),
+                        help=f'Path of the BOW model (default: {config.DEFAULT_BOW_MODEL_PATH})')
+    parser.add_argument('--model_p', type=str, default=str(config.DEFAULT_CLASSIFIER_MODEL_PATH),
+                        help=f'Path to save the trained model (default: {config.DEFAULT_CLASSIFIER_MODEL_PATH})')
+    return parser
+
 if __name__ == "__main__":
-    bow_path = 'models/BoW_Sentiment_Model.pkl'
-    classifier_path = 'models/Classifier_Sentiment_Model'
+    parser = create_arg_parser()
+    args = parser.parse_args()
+
+    bow_path = args.bow_p
+    classifier_path = args.model_p
     
     vectorizer, classifier = load_models(bow_path, classifier_path)
     

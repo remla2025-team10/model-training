@@ -62,7 +62,21 @@ python -m restaurant_model_training.modeling.train \
     --random_state 10
 ```
 
-## 5. Deactivate the Virtual Environment (When Done)
+## 5. (Optionally) Try out the prediction
+
+### With default parameters:
+```bash
+python -m restaurant_model_training.modeling.predict
+```
+
+### With custom parameters
+```bash
+python -m restaurant_model_training.modeling.predict \
+    --bow_p <path/to/bow_model.pkl> \
+    --model_p <path/to/classifier> \
+```
+
+## 6. Deactivate the Virtual Environment (When Done)
 
 ```bash
 deactivate
