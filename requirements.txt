@@ -1,5 +1,28 @@
+click==8.2.1
+ghp-import==2.1.0
+Jinja2==3.1.6
 joblib==1.4.2
+Markdown==3.8
+MarkupSafe==3.0.2
+mergedeep==1.3.4
+mkdocs==1.6.1
+mkdocs-get-deps==0.2.0
+nltk==3.9.1
 numpy==2.2.5
+packaging==25.0
 pandas==2.2.3
-scikit_learn==1.6.1
-preprocess-sentiment-analysis @ git+https://github.com/remla2025-team10/lib-ml.git@v0.0.3
+pathspec==0.12.1
+platformdirs==4.3.8
+preprocess-sentiment-analysis @ git+https://github.com/remla2025-team10/lib-ml.git@0228823108dc63b662f31a4538f426bdb8282064
+python-dateutil==2.9.0.post0
+pytz==2025.2
+PyYAML==6.0.2
+pyyaml_env_tag==1.1
+regex==2024.11.6
+scikit-learn==1.6.1
+scipy==1.15.3
+six==1.17.0
+threadpoolctl==3.6.0
+tqdm==4.67.1
+tzdata==2025.2
+watchdog==6.0.0
