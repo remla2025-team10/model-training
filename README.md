@@ -46,18 +46,20 @@ pip install -r requirements.txt
 ### With default parameters:
 
 ```bash
-python train.py
+python -m restaurant_model_training.modeling.train
 ```
 
 ### With custom parameters:
 
 ```bash
-python train.py \
-  --data_p data_path_of_training_data.tsv \
-  --processed_p save_path_for_processed_reviews.csv \
-  --bow_p save_path_for_bow_vectorizer.pkl \
-  --model_p save_path_for_trained_model \
-  --bow_max_features 1000
+python -m restaurant_model_training.modeling.train \
+    --data_p <path/to/raw_data.tsv> \
+    --processed_p <path/to/processed_data.csv> \
+    --bow_p <path/to/bow_model.pkl> \
+    --model_p <path/to/classifier> \
+    --bow_max_features 1000 \
+    --test_size 0.15 \
+    --random_state 10
 ```
 
 ## 5. Deactivate the Virtual Environment (When Done)
@@ -65,6 +67,21 @@ python train.py \
 ```bash
 deactivate
 ```
+
+# Structure
+The structure follows the established [Cookiecutter template](https://github.com/drivendataorg/cookiecutter-data-science) for data science projects. Some of the structure still contains empty files/folders, as they were created according to the template and may be used in the future.
+
+The directories you should pay attention to are the following:
+* `data/`: The folder containing all the data files
+    * `raw/`: Original raw data dumps
+    * `processed/`: The processed data directly used by the model
+* `models/`: Containes the models which have already been trained
+* `restaurant_model_training/`: The main package (module) of this project
+    * `config.py`: Contains the configurations such as default values and paths
+    * `dataset.py`: Logic for loading and preprocessing the data
+    * `features.py`: Logic for creating BOW features
+    * `modeling/`: Module containing logic for model training (`train.py`) and predicting (`predict.py`)
+* `requirements.txt`: The project dependencies
 
 ## Notes
 
