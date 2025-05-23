@@ -65,6 +65,42 @@ python train.py \
 ```bash
 deactivate
 ```
+## Remote Model Repository
+
+This repository uses [Data Version Control (DVC)](https://dvc.org/) to manage machine learning datasets and model artifacts. We've configured a Google Drive remote storage to facilitate collaboration without duplicating large data files in Git.
+
+### Dependencies
+
+Make sure you have `DVC` and `dvc-gdrive` installed. If not, you can run `pip install -r requirements.txt` to install all dependencies, including DVC and dvc-gdrive.
+
+### Remote Storage Configuration
+
+We use Google Drive as our DVC remote storage. The configuration can be set with a script **(Please reach out to us to get the bash file with credentials)**, and it will been set up in the `.dvc/config` file. You can check the current remote configuration with:
+
+```bash
+dvc remote list
+```
+
+### Woring with DVC
+
+After making changes to tracked data files, reproduce the pipeline:
+
+```bash
+dvc repro
+```
+
+Push your data changes to the remote:
+
+```bash
+dvc push
+```
+
+Pull the latest changes from the remote:
+
+```bash
+dvc pull
+```
+
 
 ## Notes
 
