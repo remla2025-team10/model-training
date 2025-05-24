@@ -76,7 +76,19 @@ python -m restaurant_model_training.modeling.predict \
     --model_p <path/to/classifier> \
 ```
 
-## 6. Deactivate the Virtual Environment (When Done)
+## 6. (Optionally) test the model
+
+### Install local package (restaurant_model_training)
+```bash
+pip install -e .
+```
+
+### Run the tests manually
+```bash
+pytest tests/ -v --cov=. --cov-report=term-missing
+```
+
+## 7. Deactivate the Virtual Environment (When Done)
 
 ```bash
 deactivate
@@ -95,7 +107,13 @@ The directories you should pay attention to are the following:
     * `dataset.py`: Logic for loading and preprocessing the data
     * `features.py`: Logic for creating BOW features
     * `modeling/`: Module containing logic for model training (`train.py`) and predicting (`predict.py`)
+* `tests/`: The test files for the model  
+    * `test_data_features.py`: Tests for data and features
+    * `test_infrastructure.py`: Tests for infrastructure
+    * `test_model_development.py`: Tests for model training, evaluation, robustness
+    * `test_monitoring.py`: Tests for model monitoring
 * `requirements.txt`: The project dependencies
+* `setup.py`: The package setup file
 
 ## Notes
 
