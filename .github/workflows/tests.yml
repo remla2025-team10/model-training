@@ -23,17 +23,18 @@ jobs:
         pip install pylint flake8 bandit pytest pytest-cov
 
     - name: Run pylint
-      run: pylint --output-format=text train.py preprocess_sentiment_analysis.py || echo "Pylint issues found"
+      run: |
+        pylint --output-format=text restaurant_model_training/ || echo "Pylint issues found"
     
     - name: Run flake8
-      run: flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+      run: flake8 restaurant_model_training/ --count --select=E9,F63,F7,F82 --show-source --statistics
     
     - name: Run bandit
-      run: bandit -r . -c bandit.yaml -f json -o bandit-results.json || echo "Bandit issues found"
+      run: bandit -r restaurant_model_training/ -c bandit.yaml -f json -o bandit-results.json || echo "Bandit issues found"
     
     - name: Run tests with coverage
       run: |
-        pytest --cov=. --cov-report=xml
+        pytest tests/ --cov=restaurant_model_training --cov-report=xml
         
     - name: Upload coverage to README
       run: |
