@@ -1,0 +1,12 @@
+exclude_dirs:
+  - 'venv'
+  - 'tests'
+
+skips:
+  - 'B101'  # assert语句在测试中很常见
+
+profiles:
+  ml_security:
+    include:
+      - 'B506'  # 敏感数据泄露风险
+      - 'B608'  # 硬编码密钥
