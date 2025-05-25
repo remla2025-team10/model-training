@@ -2,7 +2,7 @@ import joblib
 import argparse
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 from pathlib import Path
 import json
 
@@ -24,9 +24,21 @@ def train_model(features, labels, model_output_path, test_size = config.DEFAULT_
     joblib.dump(classifier, model_output_path)
     print(f'Model accuracy: {accuracy}')
 
+    # More metrics
+    precision = precision_score(y_test, y_pred, average="weighted")
+    recall = recall_score(y_test, y_pred, average="weighted")
+    f1 = f1_score(y_test, y_pred, average="weighted")
+    conf_matrix = confusion_matrix(y_test, y_pred).tolist()
+
     # Store accuracy in a JSON file (for DVC)
     with open(config.DEFAULT_METRICS_PATH, "w") as f:
-        json.dump({"accuracy": accuracy}, f)
+        json.dump({
+            "accuracy": accuracy,
+            "precision": precision,
+            "recall": recall,
+            "f1_score": f1,
+            "confusion_matrix": conf_matrix,
+        }, f, indent=2)
 
     return classifier
 

@@ -43,16 +43,16 @@ stages:
       size: 935
     - path: restaurant_model_training/modeling/train.py
       hash: md5
-      md5: 9b5f88df3b4ef855a42726cc49fc39fa
-      size: 3443
+      md5: 3a38ca6d9887a80f861f0601de6f21e3
+      size: 3938
     outs:
     - path: metrics/metrics.json
       hash: md5
-      md5: 22e4033c6fc09307f4c19b82ff2f0967
-      size: 32
+      md5: a3620ce8e4816a1335a70189045e3421
+      size: 229
     - path: models/BoW_Sentiment_Model.pkl
       hash: md5
-      md5: 81d8e872ddfb2153aa9c588beeae4b0c
+      md5: 170edaf35e10ad2135e5034e81f8c34d
       size: 39451
     - path: models/Classifier_Sentiment_Model
       hash: md5
