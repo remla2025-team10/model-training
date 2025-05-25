@@ -1,0 +1,22 @@
+stages:
+  get_data:
+    cmd: python restaurant_model_training/get_data.py
+    deps:
+    - restaurant_model_training/get_data.py
+    outs:
+      - data/raw
+  preprocess:
+    cmd: python restaurant_model_training/preprocessing.py
+    deps:
+      - restaurant_model_training/preprocessing.py
+    outs:
+      - data/processed
+  train:
+    cmd: python -m restaurant_model_training.modeling.train
+    deps:
+      - restaurant_model_training/modeling/train.py
+    outs:
+      - models/BoW_Sentiment_Model.pkl
+      - models/Classifier_Sentiment_Model
+    metrics:
+      - metrics/metrics.json

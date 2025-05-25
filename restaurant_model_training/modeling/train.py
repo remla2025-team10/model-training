@@ -3,10 +3,12 @@ import argparse
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
 from sklearn.metrics import accuracy_score
+from pathlib import Path
+import json
 
-from .. import config
-from ..dataset import get_data
-from ..features import create_bow_features
+from restaurant_model_training import config
+from restaurant_model_training.dataset import get_data
+from restaurant_model_training.features import create_bow_features
 
 def train_model(features, labels, model_output_path, test_size = config.DEFAULT_TEST_SIZE, random_state = config.DEFAULT_RANDOM_STATE):
     X_train, X_test, y_train, y_test = train_test_split(features, labels, test_size=test_size, random_state=random_state)
@@ -21,6 +23,10 @@ def train_model(features, labels, model_output_path, test_size = config.DEFAULT_
 
     joblib.dump(classifier, model_output_path)
     print(f'Model accuracy: {accuracy}')
+
+    # Store accuracy in a JSON file (for DVC)
+    with open(config.DEFAULT_METRICS_PATH, "w") as f:
+        json.dump({"accuracy": accuracy}, f)
 
     return classifier
 
@@ -46,6 +52,9 @@ def create_arg_parser():
 if __name__ == "__main__":
     parser = create_arg_parser()
     args = parser.parse_args()
+
+    Path(config.MODELS_DIR).mkdir(parents=True, exist_ok=True)
+    Path(config.METRICS_DIR).mkdir(parents=True, exist_ok=True)
 
     corpus, labels = get_data(
         raw_data_path=args.data_p,
