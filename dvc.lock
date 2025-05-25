@@ -3,6 +3,10 @@ stages:
   get_data:
     cmd: python restaurant_model_training/get_data.py
     deps:
+    - path: restaurant_model_training/config.py
+      hash: md5
+      md5: 000125159de63970013fd0f95a398ad6
+      size: 935
     - path: restaurant_model_training/get_data.py
       hash: md5
       md5: 4c8642a4f4f43d7bb84af5065264db79
@@ -16,6 +20,10 @@ stages:
   preprocess:
     cmd: python restaurant_model_training/preprocessing.py
     deps:
+    - path: restaurant_model_training/config.py
+      hash: md5
+      md5: 000125159de63970013fd0f95a398ad6
+      size: 935
     - path: restaurant_model_training/preprocessing.py
       hash: md5
       md5: 1dff6b88f805c9b3fed611d4cd567d25
@@ -29,6 +37,10 @@ stages:
   train:
     cmd: python -m restaurant_model_training.modeling.train
     deps:
+    - path: restaurant_model_training/config.py
+      hash: md5
+      md5: 000125159de63970013fd0f95a398ad6
+      size: 935
     - path: restaurant_model_training/modeling/train.py
       hash: md5
       md5: 9b5f88df3b4ef855a42726cc49fc39fa
@@ -36,13 +48,13 @@ stages:
     outs:
     - path: metrics/metrics.json
       hash: md5
-      md5: cd6f5fb4cb9281088914cac59ba8be5c
+      md5: 22e4033c6fc09307f4c19b82ff2f0967
       size: 32
     - path: models/BoW_Sentiment_Model.pkl
       hash: md5
-      md5: 97912c296013d3130d62c73aa5f8ad34
+      md5: 81d8e872ddfb2153aa9c588beeae4b0c
       size: 39451
     - path: models/Classifier_Sentiment_Model
       hash: md5
-      md5: 457ea82f8c39bcec80bf56416d5a348b
+      md5: 6be272fb134782be08a6ffd7475eb52c
       size: 46215

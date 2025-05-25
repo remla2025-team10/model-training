@@ -3,18 +3,21 @@ stages:
     cmd: python restaurant_model_training/get_data.py
     deps:
     - restaurant_model_training/get_data.py
+    - restaurant_model_training/config.py
     outs:
       - data/raw
   preprocess:
     cmd: python restaurant_model_training/preprocessing.py
     deps:
       - restaurant_model_training/preprocessing.py
+      - restaurant_model_training/config.py
     outs:
       - data/processed
   train:
     cmd: python -m restaurant_model_training.modeling.train
     deps:
       - restaurant_model_training/modeling/train.py
+      - restaurant_model_training/config.py
     outs:
       - models/BoW_Sentiment_Model.pkl
       - models/Classifier_Sentiment_Model
