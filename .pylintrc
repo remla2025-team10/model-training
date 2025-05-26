@@ -1,0 +1,28 @@
+[MASTER]
+py-version = 3.12
+# Parallel checking
+jobs=1
+
+[MESSAGES CONTROL]
+# Disable some unnecessary checks
+disable=
+    C0103,
+    C0111,
+    R0914,
+    R0915,
+
+[FORMAT]
+max-line-length=100
+
+[DESIGN]
+max-args=10
+max-locals=25
+max-public-methods=30
+
+[SIMILARITIES]
+min-similarity-lines=8
+ignore-comments=yes
+ignore-docstrings=yes
+
+[ML-SPECIFIC]
+# Specific to ML
