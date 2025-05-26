@@ -1,5 +1,7 @@
 # model-training
 
+![Coverage](https://img.shields.io/badge/Coverage-0%25-red)
+
 This repository trains a Restaurant Review Sentiment Analysis model using the Naive Bayes classifier.
 
 # Project Setup
