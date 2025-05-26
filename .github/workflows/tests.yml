@@ -1,0 +1,71 @@
+name: Code Quality & Tests
+
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    branches: ['main']
+
+permissions:
+  contents: write
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pylint flake8 bandit pytest pytest-cov
+        pip install -e .
+
+    - name: Run pylint
+      run: |
+        pylint --output-format=text restaurant_model_training/ || echo "Pylint issues found"
+    
+    - name: Run flake8
+      run: flake8 restaurant_model_training/ --count --select=E9,F63,F7,F82 --show-source --statistics
+    
+    - name: Run bandit
+      run: bandit -r restaurant_model_training/ -c bandit.yaml -f json -o bandit-results.json || echo "Bandit issues found"
+    
+    - name: Run tests with coverage
+      run: |
+        pytest tests/ --cov=restaurant_model_training --cov-report=xml
+        
+    - name: Update coverage badge in README
+      run: |
+        # Extract coverage percentage from coverage.xml
+        COVERAGE=$(grep -o 'line-rate="[0-9.]*"' coverage.xml | head -1 | cut -d'"' -f2 | awk '{printf "%.0f", $1*100}')
+        echo "Coverage: ${COVERAGE}%"
+        
+        # Determine badge color based on coverage
+        if [ "$COVERAGE" -ge 80 ]; then
+          COLOR="brightgreen"
+        elif [ "$COVERAGE" -ge 60 ]; then
+          COLOR="yellow"
+        else
+          COLOR="red"
+        fi
+        
+        # Update the coverage badge in README.md
+        sed -i "s/!\[Coverage\](https:\/\/img\.shields\.io\/badge\/Coverage-[0-9]*%25-[a-z]*)/![Coverage](https:\/\/img.shields.io\/badge\/Coverage-${COVERAGE}%25-${COLOR})/" README.md
+        
+        echo "## Test Coverage" >> $GITHUB_STEP_SUMMARY
+        echo "Coverage: ${COVERAGE}%" >> $GITHUB_STEP_SUMMARY
+        
+    - name: Commit updated README
+      if: github.event_name == 'push'
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add README.md
+        git diff --staged --quiet || git commit -m "Update coverage badge [skip ci]"
+        git push || echo "No changes to push"
