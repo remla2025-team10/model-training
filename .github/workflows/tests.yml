@@ -2,7 +2,8 @@ name: Code Quality & Tests
 
 on:
   push:
-    branches: ['main']
+    branches: ['*']
+    tags: ['*']
   pull_request:
     branches: ['main']
 
@@ -31,7 +32,14 @@ jobs:
 
     - name: Run pylint
       run: |
-        pylint --output-format=text restaurant_model_training/ || echo "Pylint issues found"
+        pylint --output-format=text restaurant_model_training/ > pylint.log|| echo "Pylint issues found"
+
+    - name: Parse Pylint score and update README badge
+      run: |
+        PYLINT_SCORE=$(grep "Your code has been rated at" pylint.log | awk '{print $7}' | cut -d'/' -f1)
+        sed -i "s/!\[Pylint\](https:\/\/img\.shields\.io\/badge\/Pylint-[0-9.]*-[a-z]*)/![Pylint](https:\/\/img.shields.io\/badge\/Pylint-${PYLINT_SCORE}-blue)/" README.md
+        echo "## Pylint Score" >> $GITHUB_STEP_SUMMARY
+        echo "Coverage: ${PYLINT_SCORE}%" >> $GITHUB_STEP_SUMMARY
     
     - name: Run flake8
       run: flake8 restaurant_model_training/ --count --select=E9,F63,F7,F82 --show-source --statistics
@@ -72,3 +80,80 @@ jobs:
         git add README.md
         git diff --staged --quiet || git commit -m "Update coverage badge [skip ci]"
         git push || echo "No changes to push"
+
+  versioning:
+    needs: quality
+    if: github.ref == 'refs/tags/release' || startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Determine version
+        id: version
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            # Use the tag directly
+            NEW_VERSION="${GITHUB_REF#refs/tags/v}"
+            echo "Using pushed version tag: $NEW_VERSION"
+          else
+            # Bump patch version from latest stable vX.Y.Z tag
+            LATEST_TAG=$(git tag --sort=-v:refname | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1)
+            if [[ -z "$LATEST_TAG" ]]; then
+              echo "No existing version tag found, defaulting to v0.0.1"
+              NEW_VERSION="v0.0.1"
+            else
+              IFS='.' read -r MAJOR MINOR PATCH <<< "${LATEST_TAG#v}"
+              PATCH=$((PATCH + 1))
+              NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+              echo "Bumped version: $LATEST_TAG -> $NEW_VERSION"
+            fi
+          fi
+
+          echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+      # Remove the pushed tags
+      - name: Remove tags
+        run: |
+          git checkout -b main
+          if [[ "$GITHUB_REF" == "refs/tags/release" ]]; then
+            git tag -d release
+            git push origin :release
+          else
+            git tag -d v${{ steps.version.outputs.version }}
+            git push origin :v${{ steps.version.outputs.version }}
+          fi
+          
+      - name: Create GitHub release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: v${{ steps.version.outputs.version }}
+          name: Release v${{ steps.version.outputs.version }}
+          artifacts: "models/*"
+          allowUpdates: true
+
+      - name: Bump patch and add pre tag
+        id: prerelease
+        run: |
+          IFS='.' read -r MAJOR MINOR PATCH <<< "${{ steps.version.outputs.version }}"
+          PATCH=$((PATCH + 1))
+          PRE_VERSION="v$MAJOR.$MINOR.$PATCH-pre"
+
+          git checkout main
+          git pull origin main
+
+          echo "Creating empty commit for $PRE_VERSION"
+          git commit --allow-empty -m "chore: bump version to $PRE_VERSION"
+          git tag "$PRE_VERSION"
+
+          git push origin main
+          git push origin "$PRE_VERSION"

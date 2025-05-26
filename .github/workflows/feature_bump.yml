@@ -1,0 +1,68 @@
+name: Pre-release Versioning for Feature Branches
+
+on:
+  push:
+    branches-ignore:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  prerelease:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get current branch name
+        id: branch
+        run: |
+          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          SAFE_BRANCH=$(echo "$BRANCH_NAME" | tr '/' '-' | tr '_' '-')  # sanitize
+          echo "branch=$SAFE_BRANCH" >> $GITHUB_OUTPUT
+
+      - name: Fetch all tags
+        run: git fetch --tags
+
+      - name: Find latest pre-release base tag from main
+        id: base
+        run: |
+          BASE_TAG=$(git tag --sort=-creatordate | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+-pre$' | head -n 1)
+          echo "Base pre-release tag: $BASE_TAG"
+          if [ -z "$BASE_TAG" ]; then
+            echo "No base pre-release tag found (e.g., v1.2.3-pre)."
+            exit 1
+          fi
+          echo "base_tag=$BASE_TAG" >> $GITHUB_OUTPUT
+
+      - name: Calculate next tag
+        id: version
+        run: |
+          BASE=${{ steps.base.outputs.base_tag }}-${{ steps.branch.outputs.branch }}
+          MATCHING_TAGS=$(git tag | grep "^${BASE}\.[0-9]*$" || true)
+
+          if [[ -z "$MATCHING_TAGS" ]]; then
+            NEXT_TAG="${BASE}.0"
+          else
+            LAST_NUM=$(echo "$MATCHING_TAGS" | sed -E "s/^${BASE}\.//" | sort -n | tail -1)
+            NEXT_NUM=$((LAST_NUM + 1))
+            NEXT_TAG="${BASE}.${NEXT_NUM}"
+          fi
+
+          echo "Calculated tag: $NEXT_TAG"
+          echo "tag=$NEXT_TAG" >> $GITHUB_OUTPUT
+
+      - name: Create and push tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag ${{ steps.version.outputs.tag }}
+          git push origin ${{ steps.version.outputs.tag }}
+
+      - name: Show result
+        run: |
+          echo "Tag pushed: ${{ steps.version.outputs.tag }}"
