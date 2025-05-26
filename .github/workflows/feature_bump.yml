@@ -53,7 +53,7 @@ jobs:
             NEXT_TAG="${BASE}.${NEXT_NUM}"
           fi
 
-          echo "✅ Calculated tag: $NEXT_TAG"
+          echo "Calculated tag: $NEXT_TAG"
           echo "tag=$NEXT_TAG" >> $GITHUB_OUTPUT
 
       - name: Create and push tag
@@ -65,4 +65,4 @@ jobs:
 
       - name: Show result
         run: |
-          echo "📌 Tag pushed: ${{ steps.version.outputs.tag }}"
+          echo "Tag pushed: ${{ steps.version.outputs.tag }}"
