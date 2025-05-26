@@ -1,0 +1,60 @@
+schema: '2.0'
+stages:
+  get_data:
+    cmd: python restaurant_model_training/get_data.py
+    deps:
+    - path: restaurant_model_training/config.py
+      hash: md5
+      md5: 000125159de63970013fd0f95a398ad6
+      size: 935
+    - path: restaurant_model_training/get_data.py
+      hash: md5
+      md5: 4c8642a4f4f43d7bb84af5065264db79
+      size: 956
+    outs:
+    - path: data/raw
+      hash: md5
+      md5: 706d6ab9d8fddff5a47d00b0f65208b8.dir
+      size: 61190
+      nfiles: 2
+  preprocess:
+    cmd: python restaurant_model_training/preprocessing.py
+    deps:
+    - path: restaurant_model_training/config.py
+      hash: md5
+      md5: 000125159de63970013fd0f95a398ad6
+      size: 935
+    - path: restaurant_model_training/preprocessing.py
+      hash: md5
+      md5: 1dff6b88f805c9b3fed611d4cd567d25
+      size: 779
+    outs:
+    - path: data/processed
+      hash: md5
+      md5: 39c9c01b540526d72c89a6a636d33b26.dir
+      size: 85097
+      nfiles: 1
+  train:
+    cmd: python -m restaurant_model_training.modeling.train
+    deps:
+    - path: restaurant_model_training/config.py
+      hash: md5
+      md5: 000125159de63970013fd0f95a398ad6
+      size: 935
+    - path: restaurant_model_training/modeling/train.py
+      hash: md5
+      md5: 3a38ca6d9887a80f861f0601de6f21e3
+      size: 3938
+    outs:
+    - path: metrics/metrics.json
+      hash: md5
+      md5: a3620ce8e4816a1335a70189045e3421
+      size: 229
+    - path: models/BoW_Sentiment_Model.pkl
+      hash: md5
+      md5: 170edaf35e10ad2135e5034e81f8c34d
+      size: 39451
+    - path: models/Classifier_Sentiment_Model
+      hash: md5
+      md5: 6be272fb134782be08a6ffd7475eb52c
+      size: 46215

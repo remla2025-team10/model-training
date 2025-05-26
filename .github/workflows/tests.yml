@@ -26,6 +26,10 @@ jobs:
         pip install pylint flake8 bandit pytest pytest-cov
         pip install -e .
 
+    - name: Get files
+      run: |
+        dvc repro
+
     - name: Run pylint
       run: |
         pylint --output-format=text restaurant_model_training/ || echo "Pylint issues found"

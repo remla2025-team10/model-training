@@ -2,11 +2,13 @@ import argparse
 import joblib
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
+from pathlib import Path
+import json
 
-from .. import config
-from ..dataset import get_data
-from ..features import create_bow_features
+from restaurant_model_training import config
+from restaurant_model_training.dataset import get_data
+from restaurant_model_training.features import create_bow_features
 
 def train_model(input_features, input_labels, model_output_path,
                 test_size=config.DEFAULT_TEST_SIZE,
@@ -25,6 +27,22 @@ def train_model(input_features, input_labels, model_output_path,
 
     joblib.dump(classifier, model_output_path)
     print(f'Model accuracy: {accuracy}')
+
+    # More metrics
+    precision = precision_score(y_test, y_pred, average="weighted")
+    recall = recall_score(y_test, y_pred, average="weighted")
+    f1 = f1_score(y_test, y_pred, average="weighted")
+    conf_matrix = confusion_matrix(y_test, y_pred).tolist()
+
+    # Store accuracy in a JSON file (for DVC)
+    with open(config.DEFAULT_METRICS_PATH, "w") as f:
+        json.dump({
+            "accuracy": accuracy,
+            "precision": precision,
+            "recall": recall,
+            "f1_score": f1,
+            "confusion_matrix": conf_matrix,
+        }, f, indent=2)
 
     return classifier
 
@@ -68,6 +86,9 @@ def create_argument_parser():
 if __name__ == "__main__":
     argument_parser = create_argument_parser()
     args = argument_parser.parse_args()
+
+    Path(config.MODELS_DIR).mkdir(parents=True, exist_ok=True)
+    Path(config.METRICS_DIR).mkdir(parents=True, exist_ok=True)
 
     corpus, data_labels = get_data(
         raw_data_path=args.data_p,
