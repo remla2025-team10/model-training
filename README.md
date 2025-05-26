@@ -97,6 +97,25 @@ The directories you should pay attention to are the following:
     * `modeling/`: Module containing logic for model training (`train.py`) and predicting (`predict.py`)
 * `requirements.txt`: The project dependencies
 
+# Setup Remote Storage
+
+## Create config.local file
+Add the secret for the remote storage with:
+
+```bash
+dvc remote modify --local myremote gdrive_client_id 375913846623-51tmacon66o5f53lqhro3f5kphoj1sgj.apps.googleusercontent.com
+dvc remote modify --local myremote gdrive_client_secret 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
+```
+
+After this is done, you can pull the artifacts with `dvc pull`.
+
+## Execute pipeline
+You can execute the pipeline with `dvc repro`.
+
+## Run experiment
+
+Run an experiment with `dvc exp run`, compare and show with `dvc exp show`.
 ## Notes
 
 - The code is tested on Python 3.12.
+
