@@ -80,14 +80,9 @@ python -m restaurant_model_training.modeling.predict \
 
 ## 6. (Optionally) test the model
 
-### Install local package (restaurant_model_training)
-```bash
-pip install -e .
-```
-
 ### Run the tests manually
 ```bash
-pytest tests/ -v --cov=. --cov-report=term-missing
+pytest --cov=restaurant_model_training tests/
 ```
 
 ## 7. Deactivate the Virtual Environment (When Done)
