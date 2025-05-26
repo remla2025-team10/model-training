@@ -111,6 +111,14 @@ We use Google Drive as our DVC remote storage. The configuration can be set with
 dvc remote list
 ```
 
+### Adding our Google Drive Remote Storage
+Run the following commands to install the secrets required for our Google Drive Remote Storage:
+
+```bash
+dvc remote modify --local myremote gdrive_client_id 375913846623-51tmacon66o5f53lqhro3f5kphoj1sgj.apps.googleusercontent.com
+dvc remote modify --local myremote gdrive_client_secret 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
+```
+
 ### Woring with DVC
 
 After making changes to tracked data files, reproduce the pipeline:
@@ -130,6 +138,9 @@ Pull the latest changes from the remote:
 ```bash
 dvc pull
 ```
+
+To run an experiment, execute `dvc exp run`, to compare and show metrics from different experiments, execute `dvc exp show`.
+
 
 
 # Structure
@@ -153,24 +164,6 @@ The directories you should pay attention to are the following:
 * `requirements.txt`: The project dependencies
 * `setup.py`: The package setup file
 
-# Setup Remote Storage
-
-## Create config.local file
-Add the secret for the remote storage with:
-
-```bash
-dvc remote modify --local myremote gdrive_client_id 375913846623-51tmacon66o5f53lqhro3f5kphoj1sgj.apps.googleusercontent.com
-dvc remote modify --local myremote gdrive_client_secret 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
-```
-
-After this is done, you can pull the artifacts with `dvc pull`.
-
-## Execute pipeline
-You can execute the pipeline with `dvc repro`.
-
-## Run experiment
-
-Run an experiment with `dvc exp run`, compare and show with `dvc exp show`.
 ## Notes
 
 - The code is tested on Python 3.12.
