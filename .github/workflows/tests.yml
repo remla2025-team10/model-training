@@ -21,6 +21,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install pylint flake8 bandit pytest pytest-cov
+        pip install -e .
 
     - name: Run pylint
       run: |
@@ -39,4 +40,4 @@ jobs:
     - name: Upload coverage to README
       run: |
         echo "## Test Coverage" >> $GITHUB_STEP_SUMMARY
-        cat coverage.xml | grep -o 'line-rate="[0-9.]*"' | head -1 | cut -d'"' -f2 | awk '{print "Coverage: " $1*100 "%"}' >> $GITHUB_STEP_SUMMARY
+        grep -o 'line-rate="[0-9.]*"' coverage.xml | head -1 | cut -d'"' -f2 | awk '{print "Coverage: " $1*100 "%"}' >> $GITHUB_STEP_SUMMARY

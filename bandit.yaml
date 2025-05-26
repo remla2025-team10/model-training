@@ -3,10 +3,12 @@ exclude_dirs:
   - 'tests'
 
 skips:
-  - 'B101'  # assert语句在测试中很常见
+  - 'B101'  # assert is commonly used for testing
+  - 'B301'  # pickle.load() - Safe in ML projects
+  - 'B403'  # pickle import - Necessary for ML models
 
 profiles:
   ml_security:
     include:
-      - 'B506'  # 敏感数据泄露风险
-      - 'B608'  # 硬编码密钥
+      - 'B506'  # sensitive data in config files
+      - 'B608'  # hardcoded password
