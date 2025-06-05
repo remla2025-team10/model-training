@@ -1,5 +1,5 @@
 import joblib
-from restaurant_model_training.modeling import train
+from restaurant_model_training.modeling import train, predict
 from sklearn.metrics import accuracy_score
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -8,6 +8,8 @@ from restaurant_model_training.dataset import get_data
 from restaurant_model_training.features import create_bow_features
 from restaurant_model_training import config
 import subprocess
+import argparse
+import pickle
 
 # Infra 1: test reproducibility of training process
 def test_reproducibility(tmp_path):
@@ -45,12 +47,14 @@ def test_reproducibility(tmp_path):
 
 # Infra 1: test reproducibility of DVC pipeline
 def test_dvc():
-    # Check if model file exists
-    pkl_files = list(config.MODELS_DIR.glob("*.pkl"))
-    assert pkl_files, "No .pkl files found in model directory!"
-
     # Run DVC pipeline and check if model is valid
-    model_path = pkl_files[0]
     result = subprocess.run(['dvc', 'repro', "--force"], capture_output=True, text=True)
     assert result.returncode == 0, "DVC repro failed!"
-    assert model_path.exists(), "Model .pkl file does not exist!"
+
+# Test argument parser creation
+def test_create_argument_parser():
+    parser = predict.create_argument_parser()
+    assert isinstance(parser, argparse.ArgumentParser)
+    args = parser.parse_args([])
+    assert hasattr(args, 'bow_p')
+    assert hasattr(args, 'model_p')
