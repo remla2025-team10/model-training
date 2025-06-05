@@ -7,6 +7,7 @@ import pickle
 from restaurant_model_training.dataset import get_data
 from restaurant_model_training.features import create_bow_features
 from restaurant_model_training import config
+import subprocess
 
 # Infra 1: test reproducibility of training process
 def test_reproducibility(tmp_path):
@@ -41,3 +42,15 @@ def test_reproducibility(tmp_path):
     acc2 = accuracy_score(y_test, model2.predict(X_test))
 
     assert abs(acc1 - acc2) < 0.01, "Training is not reproducible!"
+
+# Infra 1: test reproducibility of DVC pipeline
+def test_dvc():
+    # Check if model file exists
+    pkl_files = list(config.MODELS_DIR.glob("*.pkl"))
+    assert pkl_files, "No .pkl files found in model directory!"
+
+    # Run DVC pipeline and check if model is valid
+    model_path = pkl_files[0]
+    result = subprocess.run(['dvc', 'repro', "--force"], capture_output=True, text=True)
+    assert result.returncode == 0, "DVC repro failed!"
+    assert model_path.exists(), "Model .pkl file does not exist!"
