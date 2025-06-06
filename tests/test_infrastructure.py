@@ -1,19 +1,26 @@
 import joblib
-from restaurant_model_training.modeling import train, predict
-from sklearn.metrics import accuracy_score
-import pandas as pd
-from sklearn.model_selection import train_test_split
-import pickle
-from restaurant_model_training.dataset import get_data
-from restaurant_model_training.features import create_bow_features
-from restaurant_model_training import config
+import pytest
 import subprocess
 import argparse
 import pickle
+import pandas as pd
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split
+from restaurant_model_training.modeling import train, predict
+from restaurant_model_training.dataset import get_data
+from restaurant_model_training.features import create_bow_features
+from restaurant_model_training import config
+
+RAW_DATA_PATH = config.RAW_DATA_DIR / "a1_RestaurantReviews_HistoricDump.tsv"
+
+@pytest.fixture
+def raw_data_path(scope="module"):
+    return str(RAW_DATA_PATH)
 
 # Infra 1: test reproducibility of training process
 def test_reproducibility(tmp_path):
-    data_p = "data/raw/a1_RestaurantReviews_HistoricDump.tsv"
+    """Test that model training is reproducible with the same data and params"""
+    data_p = str(RAW_DATA_PATH)
     processed_p1 = tmp_path / "proc1.csv"
     processed_p2 = tmp_path / "proc2.csv"
     model_p1 = tmp_path / "model1.joblib"
@@ -31,6 +38,7 @@ def test_reproducibility(tmp_path):
     train.train_model(features1, labels1, model_p1, test_size=0.2, random_state=100)
     train.train_model(features2, labels2, model_p2, test_size=0.2, random_state=100)
 
+    # load models
     model1 = joblib.load(model_p1)
     model2 = joblib.load(model_p2)
 
@@ -47,11 +55,11 @@ def test_reproducibility(tmp_path):
 
 # Infra 1: test reproducibility of DVC pipeline
 def test_dvc():
-    # Run DVC pipeline and check if model is valid
+    # run DVC pipeline and check if model is valid
     result = subprocess.run(['dvc', 'repro', "--force"], capture_output=True, text=True)
     assert result.returncode == 0, "DVC repro failed!"
 
-# Test argument parser creation
+# test argument parser creation
 def test_create_argument_parser():
     parser = predict.create_argument_parser()
     assert isinstance(parser, argparse.ArgumentParser)
