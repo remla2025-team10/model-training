@@ -1,5 +1,4 @@
 import joblib
-import pytest
 import subprocess
 import argparse
 import pickle
@@ -11,16 +10,12 @@ from restaurant_model_training.dataset import get_data
 from restaurant_model_training.features import create_bow_features
 from restaurant_model_training import config
 
-RAW_DATA_PATH = config.RAW_DATA_DIR / "a1_RestaurantReviews_HistoricDump.tsv"
-
-@pytest.fixture
-def raw_data_path(scope="module"):
-    return str(RAW_DATA_PATH)
-
 # Infra 1: test reproducibility of training process
-def test_reproducibility(tmp_path):
+def test_reproducibility(tmp_path, raw_data_path):
     """Test that model training is reproducible with the same data and params"""
-    data_p = str(RAW_DATA_PATH)
+
+    # define temp paths
+    data_p = raw_data_path
     processed_p1 = tmp_path / "proc1.csv"
     processed_p2 = tmp_path / "proc2.csv"
     model_p1 = tmp_path / "model1.joblib"

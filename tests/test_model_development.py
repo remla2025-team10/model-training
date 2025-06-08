@@ -100,7 +100,9 @@ def test_model_interpretability(model_setup):
     assert proba.shape[1] == 2, "Should predict probabilities for both classes"
     assert np.allclose(proba.sum(axis=1), 1.0), "Probabilities should sum to 1"
 
-# Model 8: non-determinism robustness
+# TESTS ON ROBUSTNESS BELOW
+
+# non-determinism robustness
 def test_model_non_determinism_robustness(model_setup):
     """Test model robustness to non-deterministic behavior using data slices."""
     features, _, model, _, _ = model_setup

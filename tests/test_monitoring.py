@@ -1,17 +1,9 @@
 import pandas as pd
 import numpy as np
-import pytest
-from pathlib import Path
 from restaurant_model_training.modeling import train, predict
 from restaurant_model_training.dataset import get_data
 from restaurant_model_training.features import create_bow_features
 from restaurant_model_training import config
-
-RAW_DATA_PATH = config.RAW_DATA_DIR / "a1_RestaurantReviews_HistoricDump.tsv"
-
-@pytest.fixture
-def raw_data_path(scope="module"):
-    return str(RAW_DATA_PATH)
 
 # Monitor 2: Data invariants hold for inputs
 def test_schema(raw_data_path):
@@ -23,7 +15,7 @@ def test_schema(raw_data_path):
 
 # Monitor 2, 7: basic monitoring of output class distribution to detect skew/class collapse
 # (2) Data invariants hold in training and serving inputs
-# (7) The model has not experienced a regression in prediction quality on served dat
+# (7) The model has not experienced a regression in prediction quality on served data
 def test_prediction_monitoring(tmp_path, raw_data_path):
     """Test that prediction monitoring works correctly and predictions are distributed across classes."""
 
