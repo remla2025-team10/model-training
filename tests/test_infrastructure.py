@@ -9,6 +9,7 @@ from restaurant_model_training.modeling import train, predict
 from restaurant_model_training.dataset import get_data
 from restaurant_model_training.features import create_bow_features
 from restaurant_model_training import config
+import json
 
 # Infra 1: test reproducibility of training process
 def test_reproducibility(tmp_path, raw_data_path):
@@ -48,11 +49,29 @@ def test_reproducibility(tmp_path, raw_data_path):
 
     assert abs(acc1 - acc2) < 0.01, "Training is not reproducible!"
 
-# Infra 1: test reproducibility of DVC pipeline
+# Infra 1: Integration test reproducibility of DVC pipeline
 def test_dvc():
     # run DVC pipeline and check if model is valid
+
+    model_files = list(config.MODELS_DIR.glob("*.joblib"))
+    assert len(model_files) > 0, "No model files found in models directory!"
+
+    model_path = model_files[0] # the first model file
+    metrics_path = config.METRICS_DIR / "metrics.json" # metrics file
+
+    # run the DVC pipeline
     result = subprocess.run(['dvc', 'repro', "--force"], capture_output=True, text=True)
     assert result.returncode == 0, "DVC repro failed!"
+
+    # check if files were created
+    assert model_path.exists(), "Model file was not created!"
+    assert metrics_path.exists(), "Metrics file was not created!"
+
+    with open(metrics_path, 'r') as f:
+        metrics = json.load(f)
+        
+    assert 'accuracy' in metrics, "Metrics file does not contain accuracy!"
+    assert metrics['accuracy'] >= 0.6, "Model accuracy is below threshold!"
 
 # test argument parser creation
 def test_create_argument_parser():

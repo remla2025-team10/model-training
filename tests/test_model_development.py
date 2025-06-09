@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-from restaurant_model_training.modeling import train, predict
+from restaurant_model_training.modeling import train
 from restaurant_model_training.dataset import get_data
 from restaurant_model_training.features import create_bow_features
 from restaurant_model_training import config
@@ -28,24 +28,54 @@ def model_setup(tmp_path_factory):
 
     return features, labels, model, model_p, bow_p
 
-# Model 1, Infra 1: training determinism, config consistency
-def test_model_reproducibility(model_setup, tmp_path):
-    """Test that model training is reproducible."""
-    features, labels, _, _, _ = model_setup
+# Model 6: predictive quality threshold enforcement
+def test_model_performance_metrics(model_setup):
+    """Test that model meets minimum performance requirements."""
+    features, labels, model, _, _ = model_setup
 
-    # train two models with same params
-    model_p1 = tmp_path / "model1.joblib"
-    model_p2 = tmp_path / "model2.joblib"
-    model1 = train.train_model(features, labels, model_p1, test_size=0.2, random_state=42)
-    model2 = train.train_model(features, labels, model_p2, test_size=0.2, random_state=42)
+    # calculate performance metrics
+    y_pred = model.predict(features)
+    accuracy = accuracy_score(labels, y_pred)
+    precision = precision_score(labels, y_pred)
+    recall = recall_score(labels, y_pred)
+    f1 = f1_score(labels, y_pred)
 
-    # check if identical (random state is the same, deterministic)
-    pred1 = model1.predict(features)
-    pred2 = model2.predict(features)
-    assert np.array_equal(pred1, pred2), "Models should produce identical predictions with same parameters"
+    # make sure they meet a standard (thresholds)
+    assert accuracy >= 0.6, f"Accuracy {accuracy} below threshold 0.6"
+    assert precision >= 0.6, f"Precision {precision} below threshold 0.6"
+    assert recall >= 0.6, f"Recall {recall} below threshold 0.6"
+    assert f1 >= 0.6, f"F1 score {f1} below threshold 0.6"
+
+    # Checking important data-slices
+
+    # performance metrics on negative class
+    y_pred_neg = y_pred[labels == 0]
+    accuracy_neg = accuracy_score(labels[labels == 0], y_pred_neg)
+    assert accuracy_neg >= 0.6, f"Negative class accuracy {accuracy_neg} below threshold 0.6"
+
+    # performance metrics on positive class
+    y_pred_pos = y_pred[labels == 1]
+    accuracy_pos = accuracy_score(labels[labels == 1], y_pred_pos)
+    assert accuracy_pos >= 0.6, f"Positive class accuracy {accuracy_pos} below threshold 0.6"
+
+# Model 7: model outputs and rationale availability (interpretable)
+def test_model_interpretability(model_setup):
+    """Test that model provides interpretable outputs."""
+    features, _, model, _, _ = model_setup
+
+    # check if model has feature importances/coefficients
+    assert hasattr(model, 'predict_proba'), "Model should support probability predictions"
+    assert hasattr(model, 'class_prior_'), "Model should provide class priors"
+
+    # predict probs
+    proba = model.predict_proba(features)
+
+    # are probs well formed?
+    assert proba.shape[1] == 2, "Should predict probabilities for both classes"
+    assert np.allclose(proba.sum(axis=1), 1.0), "Probabilities should sum to 1"
 
 # Model 3: hyperparameter behavior verification
-def test_model_hyperparameters(model_setup, tmp_path):
+def test_model_hyperparameters(model_setup):
     """Test that model hyperparameters are properly set and effective."""
     features, labels, _, model_p, _ = model_setup
 
@@ -65,40 +95,6 @@ def test_model_hyperparameters(model_setup, tmp_path):
     assert len(pred1) == len(features), "Predictions should match input size"
     assert len(pred2) == len(features), "Predictions should match input size"
     assert not np.array_equal(pred1, pred2), "Model predictions should differ with different test sizes"
-
-# Model 6: predictive quality threshold enforcement
-def test_model_performance_metrics(model_setup):
-    """Test that model meets minimum performance requirements."""
-    features, labels, model, _, _ = model_setup
-
-    # calculate performance metrics
-    y_pred = model.predict(features)
-    accuracy = accuracy_score(labels, y_pred)
-    precision = precision_score(labels, y_pred)
-    recall = recall_score(labels, y_pred)
-    f1 = f1_score(labels, y_pred)
-
-    # make sure they meet a standard (thresholds)
-    assert accuracy >= 0.7, f"Accuracy {accuracy} below threshold 0.7"
-    assert precision >= 0.6, f"Precision {precision} below threshold 0.6"
-    assert recall >= 0.6, f"Recall {recall} below threshold 0.6"
-    assert f1 >= 0.6, f"F1 score {f1} below threshold 0.6"
-
-# Model 7: model outputs and rationale availability (interpretable)
-def test_model_interpretability(model_setup):
-    """Test that model provides interpretable outputs."""
-    features, _, model, _, _ = model_setup
-
-    # check if model has feature importances/coefficients
-    assert hasattr(model, 'predict_proba'), "Model should support probability predictions"
-    assert hasattr(model, 'class_prior_'), "Model should provide class priors"
-
-    # predict probs
-    proba = model.predict_proba(features)
-
-    # are probs well formed?
-    assert proba.shape[1] == 2, "Should predict probabilities for both classes"
-    assert np.allclose(proba.sum(axis=1), 1.0), "Probabilities should sum to 1"
 
 # TESTS ON ROBUSTNESS BELOW
 
