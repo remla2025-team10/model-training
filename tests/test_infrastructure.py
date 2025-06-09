@@ -50,7 +50,7 @@ def test_reproducibility(tmp_path, raw_data_path):
     assert abs(acc1 - acc2) < 0.01, "Training is not reproducible!"
 
 # Infra 1: Integration test reproducibility of DVC pipeline
-def test_dvc():
+def test_dvc(threshold):
     # run the DVC pipeline
     result = subprocess.run(['dvc', 'repro', "--force"], capture_output=True, text=True)
     assert result.returncode == 0, "DVC repro failed!"
@@ -65,7 +65,7 @@ def test_dvc():
     with open(metrics_path, 'r') as f:
         metrics = json.load(f)
     assert 'accuracy' in metrics, "Metrics file does not contain accuracy!"
-    assert metrics['accuracy'] >= 0.6, "Model accuracy is below threshold!"
+    assert metrics['accuracy'] >= threshold, f"Model accuracy is below threshold {threshold}    !"
 
 # test argument parser creation
 def test_create_argument_parser():

@@ -5,10 +5,15 @@ from restaurant_model_training.modeling import train, predict
 from restaurant_model_training import config
 
 RAW_DATA_PATH = config.RAW_DATA_DIR / "a1_RestaurantReviews_HistoricDump.tsv"
+THRESHOLD = config.PERFORMANCE_METRIC_THRESHOLD
 
 @pytest.fixture
 def raw_data_path(scope="module"):
     return str(RAW_DATA_PATH)
+
+@pytest.fixture
+def threshold(scope="module"):
+    return THRESHOLD
 
 @pytest.fixture(scope="module")
 def model_setup(tmp_path_factory):

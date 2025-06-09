@@ -3,7 +3,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 from restaurant_model_training.modeling import train, predict
 
 # Model 6: predictive quality threshold enforcement
-def test_model_performance_metrics(model_setup):
+def test_model_performance_metrics(model_setup, threshold):
     """Test that model meets minimum performance requirements."""
     features, labels, model, _, _ = model_setup
 
@@ -15,22 +15,22 @@ def test_model_performance_metrics(model_setup):
     f1 = f1_score(labels, y_pred)
 
     # make sure they meet a standard (thresholds)
-    assert accuracy >= 0.6, f"Accuracy {accuracy} below threshold 0.6"
-    assert precision >= 0.6, f"Precision {precision} below threshold 0.6"
-    assert recall >= 0.6, f"Recall {recall} below threshold 0.6"
-    assert f1 >= 0.6, f"F1 score {f1} below threshold 0.6"
+    assert accuracy >= threshold, f"Accuracy {accuracy} below threshold {threshold}"
+    assert precision >= threshold, f"Precision {precision} below threshold {threshold}"
+    assert recall >= threshold, f"Recall {recall} below threshold {threshold}"
+    assert f1 >= threshold, f"F1 score {f1} below threshold {threshold}"
 
     # Checking important data-slices
 
     # performance metrics on negative class
     y_pred_neg = y_pred[labels == 0]
     accuracy_neg = accuracy_score(labels[labels == 0], y_pred_neg)
-    assert accuracy_neg >= 0.6, f"Negative class accuracy {accuracy_neg} below threshold 0.6"
+    assert accuracy_neg >= threshold, f"Negative class accuracy {accuracy_neg} below threshold {threshold}"
 
     # performance metrics on positive class
     y_pred_pos = y_pred[labels == 1]
     accuracy_pos = accuracy_score(labels[labels == 1], y_pred_pos)
-    assert accuracy_pos >= 0.6, f"Positive class accuracy {accuracy_pos} below threshold 0.6"
+    assert accuracy_pos >= threshold, f"Positive class accuracy {accuracy_pos} below threshold {threshold}"
 
 # Model 6: Sentiment analysis slice tests
 positive_words = ["excellent", "amazing", "great", "delicious", "fantastic", "perfect", "awesome"]
