@@ -28,7 +28,7 @@ def test_prediction_monitoring(tmp_path, raw_data_path):
     # train
     corpus, labels = get_data(data_p, processed_p)
     features = create_bow_features(corpus, max_features=config.DEFAULT_MAX_FEATURES, bow_path=bow_p)
-    model = train.train_model(features, labels, model_p, test_size=0.2, random_state=42)
+    _ = train.train_model(features, labels, model_p, test_size=0.2, random_state=42)
     
     # load models
     vectorizer, classifier = predict.load_models(bow_p, model_p)

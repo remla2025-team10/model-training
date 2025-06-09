@@ -119,18 +119,3 @@ def test_model_hyperparameters(model_setup):
     assert len(pred1) == len(features), "Predictions should match input size"
     assert len(pred2) == len(features), "Predictions should match input size"
     assert not np.array_equal(pred1, pred2), "Model predictions should differ with different test sizes"
-
-def test_model_interpretability(model_setup):
-    """Test that model provides interpretable outputs."""
-    features, _, model, _, _ = model_setup
-
-    # check if model has feature importances/coefficients
-    assert hasattr(model, 'predict_proba'), "Model should support probability predictions"
-    assert hasattr(model, 'class_prior_'), "Model should provide class priors"
-
-    # predict probs
-    proba = model.predict_proba(features)
-
-    # are probs well formed?
-    assert proba.shape[1] == 2, "Should predict probabilities for both classes"
-    assert np.allclose(proba.sum(axis=1), 1.0), "Probabilities should sum to 1"

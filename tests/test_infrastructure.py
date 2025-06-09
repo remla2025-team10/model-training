@@ -55,19 +55,15 @@ def test_dvc():
     result = subprocess.run(['dvc', 'repro', "--force"], capture_output=True, text=True)
     assert result.returncode == 0, "DVC repro failed!"
 
-    model_files = list(config.MODELS_DIR.glob("*.joblib"))
-    assert len(model_files) > 0, "No model files found in models directory!"
-
-    model_path = model_files[0] # the first model file
-    metrics_path = config.METRICS_DIR / "metrics.json" # metrics file
-
     # check if files were created
+    model_path = config.DEFAULT_CLASSIFIER_MODEL_PATH
+    metrics_path = config.DEFAULT_METRICS_PATH
     assert model_path.exists(), "Model file was not created!"
     assert metrics_path.exists(), "Metrics file was not created!"
 
+    # open metrics file and check accuracy
     with open(metrics_path, 'r') as f:
         metrics = json.load(f)
-        
     assert 'accuracy' in metrics, "Metrics file does not contain accuracy!"
     assert metrics['accuracy'] >= 0.6, "Model accuracy is below threshold!"
 
