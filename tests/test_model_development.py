@@ -1,32 +1,6 @@
 import numpy as np
-import pytest
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-from restaurant_model_training.modeling import train
-from restaurant_model_training.dataset import get_data
-from restaurant_model_training.features import create_bow_features
-from restaurant_model_training import config
-
-RAW_DATA_PATH = config.RAW_DATA_DIR / "a1_RestaurantReviews_HistoricDump.tsv"
-
-@pytest.fixture(scope="module")
-def model_setup(tmp_path_factory):
-    """Fixture to prepare data, features, and train the model."""
-
-    # define temporary files
-    tmp_path = tmp_path_factory.mktemp("model_test")
-    data_p = str(RAW_DATA_PATH)
-    processed_p = tmp_path / "processed.csv"
-    bow_p = tmp_path / "bow.pkl"
-    model_p = tmp_path / "model.joblib"
-
-    # get data and features
-    corpus, labels = get_data(data_p, processed_p)
-    features = create_bow_features(corpus, max_features=config.DEFAULT_MAX_FEATURES, bow_path=bow_p)
-
-    # train model
-    model = train.train_model(features, labels, model_p, test_size=0.2, random_state=42)
-
-    return features, labels, model, model_p, bow_p
+from restaurant_model_training.modeling import train, predict
 
 # Model 6: predictive quality threshold enforcement
 def test_model_performance_metrics(model_setup):
@@ -58,43 +32,33 @@ def test_model_performance_metrics(model_setup):
     accuracy_pos = accuracy_score(labels[labels == 1], y_pred_pos)
     assert accuracy_pos >= 0.6, f"Positive class accuracy {accuracy_pos} below threshold 0.6"
 
-# Model 7: model outputs and rationale availability (interpretable)
-def test_model_interpretability(model_setup):
-    """Test that model provides interpretable outputs."""
-    features, _, model, _, _ = model_setup
+# Model 6: Sentiment analysis slice tests
+positive_words = ["excellent", "amazing", "great", "delicious", "fantastic", "perfect", "awesome"]
+negative_words = ["awful", "terrible", "bad", "disgusting", "worst", "horrible", "poor"]
 
-    # check if model has feature importances/coefficients
-    assert hasattr(model, 'predict_proba'), "Model should support probability predictions"
-    assert hasattr(model, 'class_prior_'), "Model should provide class priors"
+def test_positive_sentiment_slice(model_setup):
+    """Test that positive sentiment words are generally classified as positive (1)"""
+    _, _, _, model_p, bow_p = model_setup
+    vectorizer, classifier = predict.load_models(bow_p, model_p)
 
-    # predict probs
-    proba = model.predict_proba(features)
+    preds = predict.predict(positive_words, vectorizer, classifier)
 
-    # are probs well formed?
-    assert proba.shape[1] == 2, "Should predict probabilities for both classes"
-    assert np.allclose(proba.sum(axis=1), 1.0), "Probabilities should sum to 1"
+    # expect these words to be classified as positive (class 1)
+    positive_count = sum(preds)
+    assert positive_count >= int(len(positive_words) * 0.8), \
+        f"Expected >= 80% positive classifications, got {positive_count}/{len(positive_words)}"
 
-# Model 3: hyperparameter behavior verification
-def test_model_hyperparameters(model_setup):
-    """Test that model hyperparameters are properly set and effective."""
-    features, labels, _, model_p, _ = model_setup
+def test_negative_sentiment_slice(model_setup):
+    """Test that negative sentiment words are generally classified as negative (0)"""
+    _, _, _, model_p, bow_p = model_setup
+    vectorizer, classifier = predict.load_models(bow_p, model_p)
 
-    # train two models with different test sizes
-    model1 = train.train_model(features, labels, model_p, test_size=0.2, random_state=42)
-    model2 = train.train_model(features, labels, model_p, test_size=0.3, random_state=42)
+    preds = predict.predict(negative_words, vectorizer, classifier)
 
-    # check if hyperparameters are configured right
-    assert hasattr(model1, 'classes_'), "Model should have classes_ attribute"
-    assert hasattr(model1, 'class_prior_'), "Model should have class_prior_ attribute"
-    assert len(model1.classes_) == 2, "Model should have 2 classes"
-
-    # check if predictions are different
-    pred1 = model1.predict(features)
-    pred2 = model2.predict(features)
-
-    assert len(pred1) == len(features), "Predictions should match input size"
-    assert len(pred2) == len(features), "Predictions should match input size"
-    assert not np.array_equal(pred1, pred2), "Model predictions should differ with different test sizes"
+    # expect these words to be classified as negative (class 0)
+    negative_count = sum([1 for p in preds if p == 0])
+    assert negative_count >= int(len(negative_words) * 0.8), \
+        f"Expected >= 80% negative classifications, got {negative_count}/{len(negative_words)}"
 
 # TESTS ON ROBUSTNESS BELOW
 
@@ -133,3 +97,40 @@ def test_model_robustness(model_setup):
         # step 2: check if predictions are still valid afterwards
         assert len(predictions) == modified_features.shape[0], "Predictions should match input size"
         assert all(pred in [0, 1] for pred in predictions), "Predictions should be binary"
+
+# Model predictions should differ with different test sizes
+def test_model_hyperparameters(model_setup):
+    """Test that model hyperparameters are properly set and effective."""
+    features, labels, _, model_p, _ = model_setup
+
+    # train two models with different test sizes
+    model1 = train.train_model(features, labels, model_p, test_size=0.2, random_state=42)
+    model2 = train.train_model(features, labels, model_p, test_size=0.3, random_state=42)
+
+    # check if hyperparameters are configured right
+    assert hasattr(model1, 'classes_'), "Model should have classes_ attribute"
+    assert hasattr(model1, 'class_prior_'), "Model should have class_prior_ attribute"
+    assert len(model1.classes_) == 2, "Model should have 2 classes"
+
+    # check if predictions are different
+    pred1 = model1.predict(features)
+    pred2 = model2.predict(features)
+
+    assert len(pred1) == len(features), "Predictions should match input size"
+    assert len(pred2) == len(features), "Predictions should match input size"
+    assert not np.array_equal(pred1, pred2), "Model predictions should differ with different test sizes"
+
+def test_model_interpretability(model_setup):
+    """Test that model provides interpretable outputs."""
+    features, _, model, _, _ = model_setup
+
+    # check if model has feature importances/coefficients
+    assert hasattr(model, 'predict_proba'), "Model should support probability predictions"
+    assert hasattr(model, 'class_prior_'), "Model should provide class priors"
+
+    # predict probs
+    proba = model.predict_proba(features)
+
+    # are probs well formed?
+    assert proba.shape[1] == 2, "Should predict probabilities for both classes"
+    assert np.allclose(proba.sum(axis=1), 1.0), "Probabilities should sum to 1"

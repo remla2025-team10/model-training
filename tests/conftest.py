@@ -26,7 +26,6 @@ def model_setup(tmp_path_factory):
     features = create_bow_features(corpus, max_features=config.DEFAULT_MAX_FEATURES, bow_path=bow_p)
 
     # train model
-    train.train_model(features, labels, model_p, test_size=0.2, random_state=42)
-    vectorizer, classifier = predict.load_models(bow_p, model_p)
-    
-    return vectorizer, classifier
+    model = train.train_model(features, labels, model_p, test_size=0.2, random_state=42)
+
+    return features, labels, model, model_p, bow_p

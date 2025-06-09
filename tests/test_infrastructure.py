@@ -51,17 +51,15 @@ def test_reproducibility(tmp_path, raw_data_path):
 
 # Infra 1: Integration test reproducibility of DVC pipeline
 def test_dvc():
-    # run DVC pipeline and check if model is valid
+    # run the DVC pipeline
+    result = subprocess.run(['dvc', 'repro', "--force"], capture_output=True, text=True)
+    assert result.returncode == 0, "DVC repro failed!"
 
     model_files = list(config.MODELS_DIR.glob("*.joblib"))
     assert len(model_files) > 0, "No model files found in models directory!"
 
     model_path = model_files[0] # the first model file
     metrics_path = config.METRICS_DIR / "metrics.json" # metrics file
-
-    # run the DVC pipeline
-    result = subprocess.run(['dvc', 'repro', "--force"], capture_output=True, text=True)
-    assert result.returncode == 0, "DVC repro failed!"
 
     # check if files were created
     assert model_path.exists(), "Model file was not created!"

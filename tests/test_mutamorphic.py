@@ -12,7 +12,8 @@ mutamorphic_pairs = [
 
 def test_mutamorphic_equivalence(model_setup):
     """Test that mutamorphic pairs produce the same predictions"""
-    vectorizer, classifier = model_setup
+    features, labels, model, model_p, bow_p = model_setup
+    vectorizer, classifier = predict.load_models(bow_p, model_p)
 
     # for each pair, check if predictions are the same
     for original, variant in mutamorphic_pairs:

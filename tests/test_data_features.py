@@ -1,7 +1,8 @@
 import pandas as pd
 import numpy as np
-from restaurant_model_training import dataset, config
+from restaurant_model_training import dataset
 
+# basic dataset loading test using get_data()
 def test_generate_features(raw_data_path, tmp_path):
     """basic dataset loading test using get_data()"""
     X, y = dataset.get_data(raw_data_path, processed_data_path=tmp_path / "processed.csv")
@@ -9,6 +10,7 @@ def test_generate_features(raw_data_path, tmp_path):
     assert len(y) == X.shape[0], "Number of labels does not match number of reviews!"
     assert set(y).issubset({0, 1}), "Labels should only contain 0 or 1!"
 
+# test that the 'liked' column is not heavily imbalanced
 def test_liked_col_distribution(raw_data_path, tmp_path):
     """check that the 'liked' column is not heavily imbalanced"""
     _, y = dataset.get_data(raw_data_path, processed_data_path=tmp_path / "processed.csv")
@@ -26,24 +28,6 @@ def test_non_empty_reviews(raw_data_path):
     """check that raw review text entries are not empty (schema validation)"""
     df = pd.read_csv(raw_data_path, delimiter="\t", quoting=3)
     assert df['Review'].str.strip().str.len().min() > 0, "Some reviews are empty!" # check for empty reviews
-
-# Data1 and Data7: test input feature code
-def test_data_loading(model_setup):
-    """verify data loading process (make sure vectorizer and classifier are not None)"""
-    vectorizer, classifier = model_setup
-
-    # check if corpus and labels are not empty
-    assert vectorizer is not None, "Vectorizer should not be None"
-    assert classifier is not None, "Classifier should not be None"
-
-# Data1 and Data7: validates feature generation and tests BoW integrity
-def test_feature_vector_shape(model_setup):
-    """check that feature extraction does not exceed specified constraints (e.g, max_features)"""
-    vectorizer, _ = model_setup
-    feature_names = vectorizer.get_feature_names_out()
-
-    # check if features are below max_features limit
-    assert len(feature_names) <= config.DEFAULT_MAX_FEATURES, "Feature vector exceeds max_features constraint"
 
 # Data5: the data pipeline has appropriate privacy controls
 def test_no_emails_or_phones_in_reviews(raw_data_path):

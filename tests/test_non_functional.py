@@ -7,7 +7,8 @@ from restaurant_model_training.modeling import predict
 def test_feature_generation_cost(model_setup):
     """ test that feature generation does not exceed set memory and latency constraints"""
     # get data + temp paths
-    vectorizer, _ = model_setup
+    features, labels, model, model_p, bow_p = model_setup
+    vectorizer, classifier = predict.load_models(bow_p, model_p)
 
     # measure memory usage and latency
     process = psutil.Process()
@@ -28,29 +29,3 @@ def test_feature_generation_cost(model_setup):
 
     # check if latency is below threshold
     assert latency < 5, f"Feature generation took too long! Latency: {latency:.2f} seconds"
-
-# DATA SLICE TESTS (from lectures)
-
-# define sentiment data slices
-positive_words = ["excellent", "amazing", "great", "delicious", "fantastic", "perfect", "awesome"]
-negative_words = ["awful", "terrible", "bad", "disgusting", "worst", "horrible", "poor"]
-
-def test_positive_sentiment_slice(model_setup):
-    """Test that positive sentiment words are generally classified as positive (1)"""
-    vectorizer, classifier = model_setup
-    preds = predict.predict(positive_words, vectorizer, classifier)
-
-    # expect these words to be classified as positive (class 1)
-    positive_count = sum(preds)
-    assert positive_count >= int(len(positive_words) * 0.8), \
-        f"Expected >= 80% positive classifications, got {positive_count}/{len(positive_words)}"
-
-def test_negative_sentiment_slice(model_setup):
-    """Test that negative sentiment words are generally classified as negative (0)"""
-    vectorizer, classifier = model_setup
-    preds = predict.predict(negative_words, vectorizer, classifier)
-
-    # expect these words to be classified as negative (class 0)
-    negative_count = sum([1 for p in preds if p == 0])
-    assert negative_count >= int(len(negative_words) * 0.8), \
-        f"Expected >= 80% negative classifications, got {negative_count}/{len(negative_words)}"
