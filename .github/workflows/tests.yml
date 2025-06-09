@@ -29,6 +29,13 @@ jobs:
     - name: Get files
       run: |
         dvc repro
+    
+    - name: Upload model files
+      uses: actions/upload@v4
+      with:
+        name: model-files
+        path: models/
+        if-no-files-found: error
 
     - name: Run pylint
       run: |
@@ -132,6 +139,12 @@ jobs:
             git tag -d v${{ steps.version.outputs.version }}
             git push origin :v${{ steps.version.outputs.version }}
           fi
+
+      - name: Download model files
+        uses: actions/download-artifact@v4
+        with:
+          name: model-files
+          path: models/
           
       - name: Create GitHub release
         uses: ncipollo/release-action@v1
