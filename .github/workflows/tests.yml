@@ -31,7 +31,7 @@ jobs:
         dvc repro
     
     - name: Upload model files
-      uses: actions/upload@v4
+      uses: actions/upload-artifact@v4
       with:
         name: model-files
         path: models/
