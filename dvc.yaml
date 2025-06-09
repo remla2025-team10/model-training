@@ -20,6 +20,6 @@ stages:
       - restaurant_model_training/config.py
     outs:
       - models/BoW_Sentiment_Model.pkl
-      - models/Classifier_Sentiment_Model
+      - models/Classifier_Sentiment_Model.joblib
     metrics:
       - metrics/metrics.json

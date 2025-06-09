@@ -1,6 +1,6 @@
 # model-training
 
-![Coverage](https://img.shields.io/badge/Coverage-59%25-red)
+![Coverage](https://img.shields.io/badge/Coverage-94%25-brightgreen)
 
 This repository trains a Restaurant Review Sentiment Analysis model using the Naive Bayes classifier.
 
@@ -153,9 +153,11 @@ The directories you should pay attention to are the following:
     * `modeling/`: Module containing logic for model training (`train.py`) and predicting (`predict.py`)
 * `tests/`: The test files for the model  
     * `test_data_features.py`: Tests for data and features
-    * `test_infrastructure.py`: Tests for infrastructure
+    * `test_infrastructure.py`: Tests for infrastructure (e.g. DVC pipeline integration test)
     * `test_model_development.py`: Tests for model training, evaluation, robustness
-    * `test_monitoring.py`: Tests for model monitoring
+    * `test_monitoring.py`: Tests for model monitoring (e.g. staleness)
+    * `test_non_functional.py`: Tests for non functional features (e.g. cost of memory and latency in feature generation)
+    * `test_mutamorphic.py`: Tests for mutamorphic equivalence
 * `requirements.txt`: The project dependencies
 * `setup.py`: The package setup file
 

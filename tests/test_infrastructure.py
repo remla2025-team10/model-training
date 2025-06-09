@@ -1,16 +1,22 @@
 import joblib
-from restaurant_model_training.modeling import train
-from sklearn.metrics import accuracy_score
-import pandas as pd
-from sklearn.model_selection import train_test_split
+import subprocess
+import argparse
 import pickle
+import pandas as pd
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split
+from restaurant_model_training.modeling import train, predict
 from restaurant_model_training.dataset import get_data
 from restaurant_model_training.features import create_bow_features
 from restaurant_model_training import config
+import json
 
 # Infra 1: test reproducibility of training process
-def test_reproducibility(tmp_path):
-    data_p = "data/raw/a1_RestaurantReviews_HistoricDump.tsv"
+def test_reproducibility(tmp_path, raw_data_path):
+    """Test that model training is reproducible with the same data and params"""
+
+    # define temp paths
+    data_p = raw_data_path
     processed_p1 = tmp_path / "proc1.csv"
     processed_p2 = tmp_path / "proc2.csv"
     model_p1 = tmp_path / "model1.joblib"
@@ -28,6 +34,7 @@ def test_reproducibility(tmp_path):
     train.train_model(features1, labels1, model_p1, test_size=0.2, random_state=100)
     train.train_model(features2, labels2, model_p2, test_size=0.2, random_state=100)
 
+    # load models
     model1 = joblib.load(model_p1)
     model2 = joblib.load(model_p2)
 
@@ -41,3 +48,29 @@ def test_reproducibility(tmp_path):
     acc2 = accuracy_score(y_test, model2.predict(X_test))
 
     assert abs(acc1 - acc2) < 0.01, "Training is not reproducible!"
+
+# Infra 1: Integration test reproducibility of DVC pipeline
+def test_dvc(threshold):
+    # run the DVC pipeline
+    result = subprocess.run(['dvc', 'repro', "--force"], capture_output=True, text=True)
+    assert result.returncode == 0, "DVC repro failed!"
+
+    # check if files were created
+    model_path = config.DEFAULT_CLASSIFIER_MODEL_PATH
+    metrics_path = config.DEFAULT_METRICS_PATH
+    assert model_path.exists(), "Model file was not created!"
+    assert metrics_path.exists(), "Metrics file was not created!"
+
+    # open metrics file and check accuracy
+    with open(metrics_path, 'r') as f:
+        metrics = json.load(f)
+    assert 'accuracy' in metrics, "Metrics file does not contain accuracy!"
+    assert metrics['accuracy'] >= threshold, f"Model accuracy is below threshold {threshold}    !"
+
+# test argument parser creation
+def test_create_argument_parser():
+    parser = predict.create_argument_parser()
+    assert isinstance(parser, argparse.ArgumentParser)
+    args = parser.parse_args([])
+    assert hasattr(args, 'bow_p')
+    assert hasattr(args, 'model_p')
