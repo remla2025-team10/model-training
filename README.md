@@ -165,3 +165,15 @@ The directories you should pay attention to are the following:
 
 - The code is tested on Python 3.12.
 
+
+<!-- START_PERFORMANCE_METRICS -->
+## Performance Metrics
+
+- **Accuracy**: 0.75
+- **Precision**: 0.75
+- **Recall**: 0.75
+- **F1 Score**: 0.75
+
+- **Confusion Matrix**: [[53, 29], [16, 82]]
+
+<!-- END_PERFORMANCE_METRICS -->
