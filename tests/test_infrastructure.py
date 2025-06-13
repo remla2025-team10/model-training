@@ -10,7 +10,9 @@ from restaurant_model_training.dataset import get_data
 from restaurant_model_training.features import create_bow_features
 from restaurant_model_training import config
 import json
+import pytest
 
+@pytest.mark.ml_test_score(category_test="Infra1", status="automatic")
 # Infra 1: test reproducibility of training process
 def test_reproducibility(tmp_path, raw_data_path):
     """Test that model training is reproducible with the same data and params"""
@@ -49,7 +51,8 @@ def test_reproducibility(tmp_path, raw_data_path):
 
     assert abs(acc1 - acc2) < 0.01, "Training is not reproducible!"
 
-# Infra 1: Integration test reproducibility of DVC pipeline
+@pytest.mark.ml_test_score(category_test="Infra3", status="automatic")
+# Infra 3: Integration test reproducibility of DVC pipeline
 def test_dvc(threshold):
     # run the DVC pipeline
     result = subprocess.run(['dvc', 'repro', "--force"], capture_output=True, text=True)

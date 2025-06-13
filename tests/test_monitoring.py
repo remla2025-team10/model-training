@@ -4,7 +4,9 @@ from restaurant_model_training.modeling import train, predict
 from restaurant_model_training.dataset import get_data
 from restaurant_model_training.features import create_bow_features
 from restaurant_model_training import config
+import pytest
 
+@pytest.mark.ml_test_score(category_test="Monitor2", status="automatic")
 # Monitor 2: Data invariants hold for inputs
 def test_schema(raw_data_path):
     """Test that required columns exist (i.e. expected columns are present in raw data)"""
@@ -13,6 +15,7 @@ def test_schema(raw_data_path):
     for col in expected_columns:
         assert col in df.columns, f"{col} is missing from the dataset!"
 
+@pytest.mark.ml_test_score(category_test="Monitor7", status="automatic")
 # Monitor 2, 7: basic monitoring of output class distribution to detect skew/class collapse
 # (2) Data invariants hold in training and serving inputs
 # (7) The model has not experienced a regression in prediction quality on served data
@@ -42,6 +45,7 @@ def test_prediction_monitoring(tmp_path, raw_data_path):
     assert len(pred_dist) == 2, "Should have predictions for both classes" # (2)
     assert sum(pred_dist) == len(test_reviews), "Should have one prediction per review" # (7)
 
+@pytest.mark.ml_test_score(category_test="Monitor4", status="automatic")
 # Monitor 4, 7: evaluates key performance metrics that are compared over time
 # (4) Monitor 4: Models are not too stale (implicitly tested by performance monitoring)
 # (7) The model has not experienced a regression in prediction quality on served data.

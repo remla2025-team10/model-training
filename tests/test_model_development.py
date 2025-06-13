@@ -1,7 +1,9 @@
 import numpy as np
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from restaurant_model_training.modeling import train, predict
+import pytest
 
+@pytest.mark.ml_test_score(category_test="Model6", status="automatic")
 # Model 6: predictive quality threshold enforcement
 def test_model_performance_metrics(model_setup, threshold):
     """Test that model meets minimum performance requirements."""
@@ -32,10 +34,12 @@ def test_model_performance_metrics(model_setup, threshold):
     accuracy_pos = accuracy_score(labels[labels == 1], y_pred_pos)
     assert accuracy_pos >= threshold, f"Positive class accuracy {accuracy_pos} below threshold {threshold}"
 
-# Model 6: Sentiment analysis slice tests
+
 positive_words = ["excellent", "amazing", "great", "delicious", "fantastic", "perfect", "awesome"]
 negative_words = ["awful", "terrible", "bad", "disgusting", "worst", "horrible", "poor"]
 
+@pytest.mark.ml_test_score(category_test="Model6", status="automatic")
+# Model 6: Sentiment analysis slice tests
 def test_positive_sentiment_slice(model_setup):
     """Test that positive sentiment words are generally classified as positive (1)"""
     _, _, _, model_p, bow_p = model_setup
@@ -48,6 +52,7 @@ def test_positive_sentiment_slice(model_setup):
     assert positive_count >= int(len(positive_words) * 0.8), \
         f"Expected >= 80% positive classifications, got {positive_count}/{len(positive_words)}"
 
+@pytest.mark.ml_test_score(category_test="Model6", status="automatic")
 def test_negative_sentiment_slice(model_setup):
     """Test that negative sentiment words are generally classified as negative (0)"""
     _, _, _, model_p, bow_p = model_setup
@@ -98,6 +103,7 @@ def test_model_robustness(model_setup):
         assert len(predictions) == modified_features.shape[0], "Predictions should match input size"
         assert all(pred in [0, 1] for pred in predictions), "Predictions should be binary"
 
+@pytest.mark.ml_test_score(category_test="Model3", status="automatic")
 # Model predictions should differ with different test sizes
 def test_model_hyperparameters(model_setup):
     """Test that model hyperparameters are properly set and effective."""
