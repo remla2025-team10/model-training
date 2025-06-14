@@ -165,3 +165,34 @@ The directories you should pay attention to are the following:
 
 - The code is tested on Python 3.12.
 
+
+
+<!-- START_PERFORMANCE_METRICS -->
+## Performance Metrics
+
+- **Accuracy**: 0.75
+- **Precision**: 0.75
+- **Recall**: 0.75
+- **F1 Score**: 0.75
+
+- **Confusion Matrix**: [[53, 29], [16, 82]]
+
+<!-- END_PERFORMANCE_METRICS -->
+
+
+<!-- START_ML_TEST_SCORE -->
+## ML Test Scores
+
+**Features and Data**: 2
+
+**Model Development**: 2
+
+**ML Infrastructure**: 2
+
+**Monitoring**: 3
+
+### Final ML Test Score: 2
+
+- There’s been first pass at basic productionization, but additional investment may be needed.
+
+<!-- END_ML_TEST_SCORE -->
