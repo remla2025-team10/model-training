@@ -106,7 +106,7 @@ def test_model_robustness(model_setup):
     for i in range(0, features.shape[1], 100):
         # step 1: zero out a subset/slice of features
         modified_features = features.copy()
-        modified_features[:, i:i+100] = 0
+        modified_features[:, i:i + 100] = 0
         predictions = model.predict(modified_features)
 
         # step 2: check if predictions are still valid afterwards

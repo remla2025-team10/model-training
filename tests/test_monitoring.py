@@ -46,16 +46,16 @@ def test_prediction_monitoring(tmp_path, raw_data_path):
     # predict with monitoring
     test_reviews = ["Great food!", "Terrible service.", "Okay experience."]
     predictions = predict.predict(
-                            test_reviews,
-                            vectorizer,
-                            classifier,
-                            output_path=str(tmp_path / "test_processed.csv")
-                            )
+        test_reviews,
+        vectorizer,
+        classifier,
+        output_path=str(tmp_path / "test_processed.csv")
+    )
 
     # check prediction distribution
     pred_dist = np.bincount(predictions)
-    assert len(pred_dist) == 2, "Should have predictions for both classes" # (2)
-    assert sum(pred_dist) == len(test_reviews), "Should have one prediction per review" # (7)
+    assert len(pred_dist) == 2, "Should have predictions for both classes"  # (2)
+    assert sum(pred_dist) == len(test_reviews), "Should have one prediction per review"  # (7)
 
 @pytest.mark.ml_test_score(category_test="Monitor4", status="automatic")
 # Monitor 4, 7: evaluates key performance metrics that are compared over time

@@ -57,4 +57,3 @@ if __name__ == "__main__":
     sentiment_predictions = predict(test_reviews, model_vectorizer, model_classifier)
 
     print(sentiment_predictions)
-    

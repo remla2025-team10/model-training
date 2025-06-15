@@ -34,13 +34,13 @@ def test_reproducibility(tmp_path, raw_data_path):
     corpus1, labels1 = get_data(raw_data_path=data_p, processed_data_path=processed_p1)
     corpus2, labels2 = get_data(raw_data_path=data_p, processed_data_path=processed_p2)
     features1 = create_bow_features(
-                    corpus=corpus1,
-                    max_features=config.DEFAULT_MAX_FEATURES,
-                    bow_path=bow_p1)
+        corpus=corpus1,
+        max_features=config.DEFAULT_MAX_FEATURES,
+        bow_path=bow_p1)
     features2 = create_bow_features(
-                    corpus=corpus2,
-                    max_features=config.DEFAULT_MAX_FEATURES,
-                    bow_path=bow_p2)
+        corpus=corpus2,
+        max_features=config.DEFAULT_MAX_FEATURES,
+        bow_path=bow_p2)
 
     # run training twice with same seed and params
     train.train_model(features1, labels1, model_p1, test_size=0.2, random_state=100)
@@ -68,11 +68,11 @@ def test_dvc(threshold):
     """Test that the DVC pipeline runs and produces expected outputs"""
     # run the DVC pipeline
     result = subprocess.run(
-                ['dvc', 'repro', "--force"],
-                capture_output=True,
-                text=True,
-                check=False
-                )
+        ['dvc', 'repro', "--force"],
+        capture_output=True,
+        text=True,
+        check=False
+    )
     assert result.returncode == 0, "DVC repro failed!"
 
     # check if files were created
