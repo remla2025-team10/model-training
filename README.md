@@ -3,9 +3,11 @@
 ![Coverage](https://img.shields.io/badge/Coverage-94%25-brightgreen)
 
 
+
 <!-- START_PYLINT_SCORE -->
 ![Pylint Score](https://img.shields.io/badge/Pylint%20Score-10.00%2F10-brightgreen)
 <!-- END_PYLINT_SCORE -->
+
 
 
 
@@ -181,6 +183,7 @@ The directories you should pay attention to are the following:
 
 
 
+
 <!-- START_PERFORMANCE_METRICS -->
 ## Performance Metrics
 
@@ -192,6 +195,8 @@ The directories you should pay attention to are the following:
 - **Confusion Matrix**: [[53, 29], [16, 82]]
 
 <!-- END_PERFORMANCE_METRICS -->
+
+
 
 
 
@@ -212,4 +217,5 @@ The directories you should pay attention to are the following:
 - There’s been first pass at basic productionization, but additional investment may be needed.
 
 <!-- END_ML_TEST_SCORE -->
+
 
