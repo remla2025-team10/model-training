@@ -1,3 +1,7 @@
+"""
+Defines the configuration for the restaurant sentiment analysis project.
+This includes paths for data directories, model storage, and default parameters.
+"""
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent

@@ -1,5 +1,9 @@
+"""
+Tests for the restaurant model data features and preprocessing.
+"""
 import pandas as pd
 import numpy as np
+import pytest
 from restaurant_model_training import dataset
 
 # basic dataset loading test using get_data()
@@ -17,21 +21,34 @@ def test_liked_col_distribution(raw_data_path, tmp_path):
     labels = np.unique(y)
     assert len(labels) > 1, "Labels should contain at least two classes"
 
-    liked_counts = pd.Series(y).value_counts(normalize=True) # get the liked counts (liked = 1, disliked = 0)
+    # get the liked counts (liked = 1, disliked = 0)
+    liked_counts = pd.Series(y).value_counts(normalize=True)
 
     # check that no class has >90% of the data (imbalanced distribution)
     assert liked_counts.max() <= 0.9, "The 'liked' column is too imbalanced!"
     assert liked_counts.min() >= 0.1, "The 'liked' column is too imbalanced!"
 
-# Data1: Feature expectations are captured in a schema. We assume the reviews must be non-empty strings!
+@pytest.mark.ml_test_score(category_test="Data1", status="automatic")
+# Data1: Feature expectations are captured in a schema.
+# We assume the reviews must be non-empty strings!
 def test_non_empty_reviews(raw_data_path):
     """check that raw review text entries are not empty (schema validation)"""
     df = pd.read_csv(raw_data_path, delimiter="\t", quoting=3)
-    assert df['Review'].str.strip().str.len().min() > 0, "Some reviews are empty!" # check for empty reviews
+    # check for empty reviews
+    assert df['Review'].str.strip().str.len().min() > 0, "Some reviews are empty!"
 
+@pytest.mark.ml_test_score(category_test="Data5", status="automatic")
 # Data5: the data pipeline has appropriate privacy controls
 def test_no_emails_or_phones_in_reviews(raw_data_path):
-    """heuristic test to identify personally identifiable information (PII) such as emails and phone numbers"""
-    df = pd.read_csv(raw_data_path, delimiter="\t", quoting=3) 
-    assert not df['Review'].str.contains(r'\b[\w\.-]+@[\w\.-]+\.\w{2,4}\b', regex=True).any(), "Emails detected!"
-    assert not df['Review'].str.contains(r'\b\d{3}[-.\s]??\d{3}[-.\s]??\d{4}\b', regex=True).any(), "Phone numbers detected!"
+    """
+    Heuristic test to identify personally identifiable information (PII)
+    such as emails and phone numbers
+    """
+    df = pd.read_csv(raw_data_path, delimiter="\t", quoting=3)
+    assert not df['Review'].str.contains(
+        r'\b[\w\.-]+@[\w\.-]+\.\w{2,4}\b',
+        regex=True).any(), "Emails detected!"
+
+    assert not df['Review'].str.contains(
+        r'\b\d{3}[-.\s]??\d{3}[-.\s]??\d{4}\b',
+        regex=True).any(), "Phone numbers detected!"

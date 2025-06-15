@@ -1,16 +1,22 @@
-import joblib
+"""
+Tests for the infrastructure of the restaurant model training.
+"""
 import subprocess
 import argparse
 import pickle
+import json
+import joblib
 import pandas as pd
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
+import pytest
+
 from restaurant_model_training.modeling import train, predict
 from restaurant_model_training.dataset import get_data
 from restaurant_model_training.features import create_bow_features
 from restaurant_model_training import config
-import json
 
+@pytest.mark.ml_test_score(category_test="Infra1", status="automatic")
 # Infra 1: test reproducibility of training process
 def test_reproducibility(tmp_path, raw_data_path):
     """Test that model training is reproducible with the same data and params"""
@@ -27,8 +33,14 @@ def test_reproducibility(tmp_path, raw_data_path):
     # get data and features
     corpus1, labels1 = get_data(raw_data_path=data_p, processed_data_path=processed_p1)
     corpus2, labels2 = get_data(raw_data_path=data_p, processed_data_path=processed_p2)
-    features1 = create_bow_features(corpus=corpus1, max_features=config.DEFAULT_MAX_FEATURES, bow_path=bow_p1)
-    features2 = create_bow_features(corpus=corpus2, max_features=config.DEFAULT_MAX_FEATURES, bow_path=bow_p2)
+    features1 = create_bow_features(
+        corpus=corpus1,
+        max_features=config.DEFAULT_MAX_FEATURES,
+        bow_path=bow_p1)
+    features2 = create_bow_features(
+        corpus=corpus2,
+        max_features=config.DEFAULT_MAX_FEATURES,
+        bow_path=bow_p2)
 
     # run training twice with same seed and params
     train.train_model(features1, labels1, model_p1, test_size=0.2, random_state=100)
@@ -40,7 +52,8 @@ def test_reproducibility(tmp_path, raw_data_path):
 
     # same data, same seed -> same accuracy
     df = pd.read_csv(data_p, delimiter="\t", quoting=3)
-    X = pickle.load(open(bow_p1, 'rb')).transform(df['Review']).toarray()
+    with open(bow_p1, 'rb') as f:
+        X = pickle.load(f).transform(df['Review']).toarray()
     y = df['Liked']
     _, X_test, _, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
 
@@ -49,10 +62,17 @@ def test_reproducibility(tmp_path, raw_data_path):
 
     assert abs(acc1 - acc2) < 0.01, "Training is not reproducible!"
 
-# Infra 1: Integration test reproducibility of DVC pipeline
+@pytest.mark.ml_test_score(category_test="Infra3", status="automatic")
+# Infra 3: Integration test reproducibility of DVC pipeline
 def test_dvc(threshold):
+    """Test that the DVC pipeline runs and produces expected outputs"""
     # run the DVC pipeline
-    result = subprocess.run(['dvc', 'repro', "--force"], capture_output=True, text=True)
+    result = subprocess.run(
+        ['dvc', 'repro', "--force"],
+        capture_output=True,
+        text=True,
+        check=False
+    )
     assert result.returncode == 0, "DVC repro failed!"
 
     # check if files were created
@@ -69,6 +89,7 @@ def test_dvc(threshold):
 
 # test argument parser creation
 def test_create_argument_parser():
+    """Test that the argument parser is created correctly."""
     parser = predict.create_argument_parser()
     assert isinstance(parser, argparse.ArgumentParser)
     args = parser.parse_args([])

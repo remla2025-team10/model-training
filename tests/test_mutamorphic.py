@@ -1,5 +1,7 @@
+"""
+Contains mutamorphic tests for the model.
+"""
 from restaurant_model_training.modeling import predict
-
 
 # mutamorphic pairs: semantically similar but not syntactically equivalent
 mutamorphic_pairs = [
@@ -18,4 +20,6 @@ def test_mutamorphic_equivalence(model_setup):
     # for each pair, check if predictions are the same
     for original, variant in mutamorphic_pairs:
         preds = predict.predict([original, variant], vectorizer, classifier)
-        assert preds[0] == preds[1], f"Mutamorphic pair diverged: '{original}' => {preds[0]}, '{variant}' => {preds[1]}"
+        assert preds[0] == preds[1], (
+            f"Mutamorphic pair diverged: '{original}' => {preds[0]}, '{variant}' => {preds[1]}"
+        )
