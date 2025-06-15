@@ -83,6 +83,12 @@ python -m restaurant_model_training.modeling.predict \
 ### Run the tests manually
 ```bash
 pytest --cov=restaurant_model_training tests/
+
+```
+
+### Run pylint for code quality checks
+```bash
+pylint restaurant_model_training/ tests/
 ```
 
 ## 7. Deactivate the Virtual Environment (When Done)
@@ -151,7 +157,7 @@ The directories you should pay attention to are the following:
     * `dataset.py`: Logic for loading and preprocessing the data
     * `features.py`: Logic for creating BOW features
     * `modeling/`: Module containing logic for model training (`train.py`) and predicting (`predict.py`)
-* `tests/`: The test files for the model  
+* `tests/`: The test files for the model
     * `test_data_features.py`: Tests for data and features
     * `test_infrastructure.py`: Tests for infrastructure (e.g. DVC pipeline integration test)
     * `test_model_development.py`: Tests for model training, evaluation, robustness
