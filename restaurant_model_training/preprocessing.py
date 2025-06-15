@@ -4,7 +4,7 @@ This script preprocesses the raw restaurant reviews dataset.
 from pathlib import Path
 import pandas as pd
 from preprocess_sentiment_analysis import preprocess_dataframe
-from restaurant_model_training import config
+import config
 
 def preprocess_data(raw_data_path, processed_data_path):
     """

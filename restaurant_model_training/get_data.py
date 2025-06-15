@@ -3,7 +3,7 @@ This module loads the raw datasets for the restaurant sentiment predcition.
 """
 from pathlib import Path
 import requests
-from restaurant_model_training import config
+import config
 
 # Create directory
 Path(config.RAW_DATA_DIR).mkdir(parents=True, exist_ok=True)

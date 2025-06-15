@@ -1,7 +1,11 @@
+"""
+Test for model development and performance metrics.
+"""
 import numpy as np
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-from restaurant_model_training.modeling import train, predict
 import pytest
+
+from restaurant_model_training.modeling import train, predict
 
 @pytest.mark.ml_test_score(category_test="Model6", status="automatic")
 # Model 6: predictive quality threshold enforcement
@@ -27,12 +31,16 @@ def test_model_performance_metrics(model_setup, threshold):
     # performance metrics on negative class
     y_pred_neg = y_pred[labels == 0]
     accuracy_neg = accuracy_score(labels[labels == 0], y_pred_neg)
-    assert accuracy_neg >= threshold, f"Negative class accuracy {accuracy_neg} below threshold {threshold}"
+    assert accuracy_neg >= threshold, (
+        f"Negative class accuracy {accuracy_neg} below threshold {threshold}"
+    )
 
     # performance metrics on positive class
     y_pred_pos = y_pred[labels == 1]
     accuracy_pos = accuracy_score(labels[labels == 1], y_pred_pos)
-    assert accuracy_pos >= threshold, f"Positive class accuracy {accuracy_pos} below threshold {threshold}"
+    assert accuracy_pos >= threshold, (
+        f"Positive class accuracy {accuracy_pos} below threshold {threshold}"
+    )
 
 
 positive_words = ["excellent", "amazing", "great", "delicious", "fantastic", "perfect", "awesome"]
@@ -61,7 +69,7 @@ def test_negative_sentiment_slice(model_setup):
     preds = predict.predict(negative_words, vectorizer, classifier)
 
     # expect these words to be classified as negative (class 0)
-    negative_count = sum([1 for p in preds if p == 0])
+    negative_count = sum(p == 0 for p in preds)
     assert negative_count >= int(len(negative_words) * 0.8), \
         f"Expected >= 80% negative classifications, got {negative_count}/{len(negative_words)}"
 
@@ -73,7 +81,7 @@ def test_model_non_determinism_robustness(model_setup):
     features, _, model, _, _ = model_setup
 
     # split data in subsets (5 slices)
-    slice_size = features.shape[0] // 5 
+    slice_size = features.shape[0] // 5
     predictions = []
 
     # for each slice, check if predictions are binary/consistent
@@ -85,9 +93,11 @@ def test_model_non_determinism_robustness(model_setup):
 
     # check if predictions in each slice are consistent
     for i in range(1, len(predictions)):
-        assert len(predictions[i]) == len(predictions[i - 1]), "Prediction sizes across slices should match"
+        assert len(predictions[i]) == len(predictions[i - 1]), (
+            "Prediction sizes across slices should match"
+        )
 
-# check robustness: handling zeroed features. 
+# check robustness: handling zeroed features.
 def test_model_robustness(model_setup):
     """Test model robustness to input variations."""
     features, _, model, _, _ = model_setup
@@ -124,4 +134,6 @@ def test_model_hyperparameters(model_setup):
 
     assert len(pred1) == len(features), "Predictions should match input size"
     assert len(pred2) == len(features), "Predictions should match input size"
-    assert not np.array_equal(pred1, pred2), "Model predictions should differ with different test sizes"
+    assert not np.array_equal(pred1, pred2), (
+        "Model predictions should differ with different test sizes"
+    )

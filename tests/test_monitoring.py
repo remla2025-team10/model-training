@@ -1,10 +1,14 @@
+"""
+Tests for monitoring functionality.
+"""
 import pandas as pd
 import numpy as np
+import pytest
+
 from restaurant_model_training.modeling import train, predict
 from restaurant_model_training.dataset import get_data
 from restaurant_model_training.features import create_bow_features
 from restaurant_model_training import config
-import pytest
 
 @pytest.mark.ml_test_score(category_test="Monitor2", status="automatic")
 # Monitor 2: Data invariants hold for inputs
@@ -20,27 +24,35 @@ def test_schema(raw_data_path):
 # (2) Data invariants hold in training and serving inputs
 # (7) The model has not experienced a regression in prediction quality on served data
 def test_prediction_monitoring(tmp_path, raw_data_path):
-    """Test that prediction monitoring works correctly and predictions are distributed across classes."""
+    """
+    Test that prediction monitoring works correctly
+    and predictions are distributed across classes.
+    """
 
     # define paths
     data_p = raw_data_path
     processed_p = tmp_path / "processed.csv"
     model_p = tmp_path / "model.joblib"
     bow_p = tmp_path / "bow.pkl"
-    
+
     # train
     corpus, labels = get_data(data_p, processed_p)
     features = create_bow_features(corpus, max_features=config.DEFAULT_MAX_FEATURES, bow_path=bow_p)
     _ = train.train_model(features, labels, model_p, test_size=0.2, random_state=42)
-    
+
     # load models
     vectorizer, classifier = predict.load_models(bow_p, model_p)
-    
+
     # predict with monitoring
     test_reviews = ["Great food!", "Terrible service.", "Okay experience."]
-    predictions = predict.predict(test_reviews, vectorizer, classifier, output_path=str(tmp_path / "test_processed.csv"))
-    
-    # check prediction distribution 
+    predictions = predict.predict(
+                            test_reviews,
+                            vectorizer,
+                            classifier,
+                            output_path=str(tmp_path / "test_processed.csv")
+                            )
+
+    # check prediction distribution
     pred_dist = np.bincount(predictions)
     assert len(pred_dist) == 2, "Should have predictions for both classes" # (2)
     assert sum(pred_dist) == len(test_reviews), "Should have one prediction per review" # (7)
@@ -51,18 +63,18 @@ def test_prediction_monitoring(tmp_path, raw_data_path):
 # (7) The model has not experienced a regression in prediction quality on served data.
 def test_performance_monitoring(tmp_path, raw_data_path):
     """Test that model performance does not regress over time (simulated)."""
-    
+
     # get paths
     data_p = raw_data_path
     processed_p = tmp_path / "processed.csv"
     model_p_1 = tmp_path / "model_v1.joblib"
     model_p_2 = tmp_path / "model_v2.joblib"
     bow_p = tmp_path / "bow.pkl"
-    
+
     # get data and features
     corpus, labels = get_data(data_p, processed_p)
     features = create_bow_features(corpus, max_features=config.DEFAULT_MAX_FEATURES, bow_path=bow_p)
-    
+
     # simulate baseline model (v1)
     model_v1 = train.train_model(features, labels, model_p_1, test_size=0.2, random_state=42)
     preds_v1 = model_v1.predict(features)
@@ -83,5 +95,3 @@ def test_performance_monitoring(tmp_path, raw_data_path):
     assert acc_v2 >= acc_v1 - tolerance, f"Accuracy regressed: {acc_v1:.2f} -> {acc_v2:.2f}"
     assert prec_v2 >= prec_v1 - tolerance, f"Precision regressed: {prec_v1:.2f} -> {prec_v2:.2f}"
     assert rec_v2 >= rec_v1 - tolerance, f"Recall regressed: {rec_v1:.2f} -> {rec_v2:.2f}"
-
-

@@ -1,18 +1,27 @@
+"""
+Tests configuration for the restaurant model training package.
+"""
 import pytest
 from restaurant_model_training.dataset import get_data
 from restaurant_model_training.features import create_bow_features
-from restaurant_model_training.modeling import train, predict
+from restaurant_model_training.modeling import train
 from restaurant_model_training import config
 
 RAW_DATA_PATH = config.RAW_DATA_DIR / "a1_RestaurantReviews_HistoricDump.tsv"
 THRESHOLD = config.PERFORMANCE_METRIC_THRESHOLD
 
 @pytest.fixture
-def raw_data_path(scope="module"):
+def raw_data_path(_scope="module"):
+    """
+    Fixture to provide the path to the raw data file.
+    """
     return str(RAW_DATA_PATH)
 
 @pytest.fixture
-def threshold(scope="module"):
+def threshold(_scope="module"):
+    """
+    Fixture to provide the performance metric threshold.
+    """
     return THRESHOLD
 
 @pytest.fixture(scope="module")
