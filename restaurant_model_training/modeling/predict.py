@@ -1,3 +1,6 @@
+"""
+Makes an example prediction to test the model and show how it works.
+"""
 import argparse
 import pickle
 import joblib
