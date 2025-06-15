@@ -2,6 +2,13 @@
 
 ![Coverage](https://img.shields.io/badge/Coverage-94%25-brightgreen)
 
+
+<!-- START_PYLINT_SCORE -->
+![Pylint Score](https://img.shields.io/badge/Pylint%20Score-10.00%2F10-brightgreen)
+<!-- END_PYLINT_SCORE -->
+
+
+
 This repository trains a Restaurant Review Sentiment Analysis model using the Naive Bayes classifier.
 
 # Project Setup
