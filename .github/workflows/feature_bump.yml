@@ -31,12 +31,34 @@ jobs:
       - name: Find latest pre-release base tag from main
         id: base
         run: |
+          # Try to find the latest pre-release base tag first
           BASE_TAG=$(git tag --sort=-creatordate | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+-pre$' | head -n 1)
-          echo "Base pre-release tag: $BASE_TAG"
+
           if [ -z "$BASE_TAG" ]; then
-            echo "No base pre-release tag found (e.g., v1.2.3-pre)."
-            exit 1
+             echo "No pre-release base tag found. Falling back to latest stable tag and incrementing patch."
+            STABLE_TAG=$(git tag --sort=-creatordate | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1)
+
+            if [ -z "$STABLE_TAG" ]; then
+              BASE_TAG="v0.0.0-pre"
+              echo "No version tags present, created new base tag $BASE_TAG"
+            else
+              echo "Found stable tag: $STABLE_TAG"
+
+              # Extract version numbers
+              VERSION=${STABLE_TAG#v}
+              MAJOR=$(echo "$VERSION" | cut -d. -f1)
+              MINOR=$(echo "$VERSION" | cut -d. -f2)
+              PATCH=$(echo "$VERSION" | cut -d. -f3)
+
+              # Increment patch
+              PATCH=$((PATCH + 1))
+
+              BASE_TAG="v${MAJOR}.${MINOR}.${PATCH}-pre"
+              echo "Incremented base tag: $BASE_TAG"
+            fi           
           fi
+
+          echo "Base tag used: $BASE_TAG"
           echo "base_tag=$BASE_TAG" >> $GITHUB_OUTPUT
 
       - name: Calculate next tag
