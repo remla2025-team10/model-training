@@ -131,7 +131,6 @@ jobs:
       # Remove the pushed tags
       - name: Remove tags
         run: |
-          git checkout -b main
           if [[ "$GITHUB_REF" == "refs/tags/release" ]]; then
             git tag -d release
             git push origin :release
