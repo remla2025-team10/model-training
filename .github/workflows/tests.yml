@@ -19,7 +19,7 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: '3.12'
-    
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -29,7 +29,7 @@ jobs:
     - name: Get files
       run: |
         dvc repro
-    
+
     - name: Upload model files
       uses: actions/upload-artifact@v4
       with:
@@ -39,31 +39,27 @@ jobs:
 
     - name: Run pylint
       run: |
-        pylint --output-format=text restaurant_model_training/ > pylint.log|| echo "Pylint issues found"
+        pylint --output-format=text restaurant_model_training/ tests/ > pylint.log|| echo "Pylint issues found"
 
-    - name: Parse Pylint score and update README badge
-      run: |
-        PYLINT_SCORE=$(grep "Your code has been rated at" pylint.log | awk '{print $7}' | cut -d'/' -f1)
-        sed -i "s/!\[Pylint\](https:\/\/img\.shields\.io\/badge\/Pylint-[0-9.]*-[a-z]*)/![Pylint](https:\/\/img.shields.io\/badge\/Pylint-${PYLINT_SCORE}-blue)/" README.md
-        echo "## Pylint Score" >> $GITHUB_STEP_SUMMARY
-        echo "Coverage: ${PYLINT_SCORE}%" >> $GITHUB_STEP_SUMMARY
-    
+    - name: Update README with Pylint score badge
+      run: python .github/metric_reporting/pylint_score.py
+
     - name: Run flake8
       run: flake8 restaurant_model_training/ --count --select=E9,F63,F7,F82 --show-source --statistics
-    
+
     - name: Run bandit
       run: bandit -r restaurant_model_training/ -c bandit.yaml -f json -o bandit-results.json || echo "Bandit issues found"
-    
+
     - name: Run tests with coverage
       run: |
         pytest tests/ --cov=restaurant_model_training --cov-report=xml
-        
+
     - name: Update coverage badge in README
       run: |
         # Extract coverage percentage from coverage.xml
         COVERAGE=$(grep -o 'line-rate="[0-9.]*"' coverage.xml | head -1 | cut -d'"' -f2 | awk '{printf "%.0f", $1*100}')
         echo "Coverage: ${COVERAGE}%"
-        
+
         # Determine badge color based on coverage
         if [ "$COVERAGE" -ge 80 ]; then
           COLOR="brightgreen"
@@ -72,20 +68,26 @@ jobs:
         else
           COLOR="red"
         fi
-        
+
         # Update the coverage badge in README.md
         sed -i "s/!\[Coverage\](https:\/\/img\.shields\.io\/badge\/Coverage-[0-9]*%25-[a-z]*)/![Coverage](https:\/\/img.shields.io\/badge\/Coverage-${COVERAGE}%25-${COLOR})/" README.md
-        
+
         echo "## Test Coverage" >> $GITHUB_STEP_SUMMARY
         echo "Coverage: ${COVERAGE}%" >> $GITHUB_STEP_SUMMARY
-        
+
+    - name: Update README with performance metrics
+      run: python .github/metric_reporting/performance_metrics.py
+
+    - name: Update README with ML Test Score
+      run: python .github/metric_reporting/ml_test_score.py
+
     - name: Commit updated README
       if: github.event_name == 'push'
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         git add README.md
-        git diff --staged --quiet || git commit -m "Update coverage badge [skip ci]"
+        git diff --staged --quiet || git commit -m "Update coverage badge [skip ci], performance metrics and ML test score"
         git push || echo "No changes to push"
 
   versioning:
@@ -144,7 +146,7 @@ jobs:
         with:
           name: model-files
           path: models/
-          
+
       - name: Create GitHub release
         uses: ncipollo/release-action@v1
         with:

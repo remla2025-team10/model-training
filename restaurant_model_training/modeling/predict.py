@@ -1,3 +1,6 @@
+"""
+Makes an example prediction to test the model and show how it works.
+"""
 import argparse
 import pickle
 import joblib
@@ -54,4 +57,3 @@ if __name__ == "__main__":
     sentiment_predictions = predict(test_reviews, model_vectorizer, model_classifier)
 
     print(sentiment_predictions)
-    

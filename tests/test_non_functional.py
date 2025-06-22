@@ -1,5 +1,8 @@
-import psutil
+"""
+Non-functional tests for the model.
+"""
 import time
+import psutil
 
 from restaurant_model_training.modeling import predict
 
@@ -17,7 +20,10 @@ def measure_performance(action, memory_threshold=200 * 1024 * 1024, latency_thre
     memory_used = final_memory - initial_memory
     latency = end_time - start_time
 
-    assert memory_used < memory_threshold, f"Memory usage exceeded {memory_threshold / (1024 * 1024):.2f} MB! Used: {memory_used / (1024 * 1024):.2f} MB"
+    assert memory_used < memory_threshold, (
+        f"Memory usage exceeded {memory_threshold / (1024 * 1024):.2f}"
+        + "MB! Used: {memory_used / (1024 * 1024):.2f} MB"
+    )
     assert latency < latency_threshold, f"Action took too long! Latency: {latency:.2f} seconds"
 
 def test_feature_generation_cost(model_setup):
@@ -44,7 +50,7 @@ def test_model_prediction_cost(model_setup):
 
     test_reviews = ["Wow... Loved this place.", "Crust is not good.",
                     "Not tasty and the texture was wrong."]
-    
+
     def model_prediction_action():
         _ = predict.predict(test_reviews, vectorizer, classifier)
 

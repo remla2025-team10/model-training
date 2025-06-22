@@ -1,10 +1,20 @@
+"""
+Train a sentiment analysis model for restaurant reviews.
+This module also includes argument parsing for specifying parameter values via command line.
+"""
+from pathlib import Path
 import argparse
+import json
 import joblib
 from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
-from pathlib import Path
-import json
+from sklearn.metrics import (
+    accuracy_score,
+    precision_score,
+    recall_score,
+    f1_score,
+    confusion_matrix,
+)
 
 from restaurant_model_training import config
 from restaurant_model_training.dataset import get_data
@@ -110,4 +120,3 @@ if __name__ == "__main__":
     )
 
     print(f"Competed training and saved to {args.model_p}")
-    

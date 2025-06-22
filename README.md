@@ -2,6 +2,15 @@
 
 ![Coverage](https://img.shields.io/badge/Coverage-94%25-brightgreen)
 
+
+
+<!-- START_PYLINT_SCORE -->
+![Pylint Score](https://img.shields.io/badge/Pylint%20Score-10.00%2F10-brightgreen)
+<!-- END_PYLINT_SCORE -->
+
+
+
+
 This repository trains a Restaurant Review Sentiment Analysis model using the Naive Bayes classifier.
 
 # Project Setup
@@ -83,6 +92,12 @@ python -m restaurant_model_training.modeling.predict \
 ### Run the tests manually
 ```bash
 pytest --cov=restaurant_model_training tests/
+
+```
+
+### Run pylint for code quality checks
+```bash
+pylint restaurant_model_training/ tests/
 ```
 
 ## 7. Deactivate the Virtual Environment (When Done)
@@ -151,7 +166,7 @@ The directories you should pay attention to are the following:
     * `dataset.py`: Logic for loading and preprocessing the data
     * `features.py`: Logic for creating BOW features
     * `modeling/`: Module containing logic for model training (`train.py`) and predicting (`predict.py`)
-* `tests/`: The test files for the model  
+* `tests/`: The test files for the model
     * `test_data_features.py`: Tests for data and features
     * `test_infrastructure.py`: Tests for infrastructure (e.g. DVC pipeline integration test)
     * `test_model_development.py`: Tests for model training, evaluation, robustness
@@ -164,4 +179,43 @@ The directories you should pay attention to are the following:
 ## Notes
 
 - The code is tested on Python 3.12.
+
+
+
+
+
+<!-- START_PERFORMANCE_METRICS -->
+## Performance Metrics
+
+- **Accuracy**: 0.75
+- **Precision**: 0.75
+- **Recall**: 0.75
+- **F1 Score**: 0.75
+
+- **Confusion Matrix**: [[53, 29], [16, 82]]
+
+<!-- END_PERFORMANCE_METRICS -->
+
+
+
+
+
+
+<!-- START_ML_TEST_SCORE -->
+## ML Test Scores
+
+**Features and Data**: 2
+
+**Model Development**: 2
+
+**ML Infrastructure**: 2
+
+**Monitoring**: 3
+
+### Final ML Test Score: 2
+
+- There’s been first pass at basic productionization, but additional investment may be needed.
+
+<!-- END_ML_TEST_SCORE -->
+
 
