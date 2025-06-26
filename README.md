@@ -56,6 +56,8 @@ pip install -r requirements.txt
 
 ## 4. Run the training script
 
+Before running the scripts, you need to ensure all of the large data files used for training the model are retrieved through DVC. Please check out [how this is done](#remote-model-repository) before proceeding with the training examples.
+
 ### With default parameters:
 
 ```bash
