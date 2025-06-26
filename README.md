@@ -165,24 +165,39 @@ To run an experiment, execute `dvc exp run`, to compare and show metrics from di
 The structure follows the established [Cookiecutter template](https://github.com/drivendataorg/cookiecutter-data-science) for data science projects. Some of the structure still contains empty files/folders, as they were created according to the template and may be used in the future.
 
 The directories you should pay attention to are the following:
+* `.dvc/config`: DVC config file
+* `.github/`
+    * `metric_reporting/` 
+        * `ml_test_score.py`: Update README.md with ML test score
+        * `performance_metrics.py`: Update README with performance metrics
+        * `pylint_score.py`: Update README.md with pylint score
+    * `workflows/`
+        * `feature_bump.yml`: Pre-release versioning for feature branches
+        * `tests.yml`: Code quality and tests
 * `data/`: The folder containing all the data files
     * `raw/`: Original raw data dumps
     * `processed/`: The processed data directly used by the model
 * `models/`: Containes the models which have already been trained
+* `pylint_plugins/`: Directory for the pylint plugins for ML code smells
 * `restaurant_model_training/`: The main package (module) of this project
+    * `modeling/`: Module containing logic for model training(`train.py`) and predicting (`predict.py`)
     * `config.py`: Contains the configurations such as default values and paths
     * `dataset.py`: Logic for loading and preprocessing the data
     * `features.py`: Logic for creating BOW features
-    * `modeling/`: Module containing logic for model training (`train.py`) and predicting (`predict.py`)
+    * `get_data.py`: Loads the raw datasets for the restaurant sentiment prediction.
+    * `preprocessing.py`: Preprocessing script (using `lib-ml` package)
 * `tests/`: The test files for the model
+    * `conftest.py`: Tests configuration for the restaurant model training package
     * `test_data_features.py`: Tests for data and features
     * `test_infrastructure.py`: Tests for infrastructure (e.g. DVC pipeline integration test)
     * `test_model_development.py`: Tests for model training, evaluation, robustness
-    * `test_monitoring.py`: Tests for model monitoring (e.g. staleness)
-    * `test_non_functional.py`: Tests for non functional features (e.g. cost of memory and latency in feature generation)
+    * `test_monitoring.py`: Tests for model monitoring (e.g. regression)
     * `test_mutamorphic.py`: Tests for mutamorphic equivalence
+    * `test_non_functional.py`: Tests for non functional features (e.g. cost of memory and latency in feature generation)
+* `.flake8`: Flake8 config file
+* `bandit.yaml`: Bandit config file
+* `dvc.yaml`: DVC pipeline
 * `requirements.txt`: The project dependencies
-* `setup.py`: The package setup file
 
 ## Notes
 
