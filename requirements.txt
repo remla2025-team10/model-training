@@ -13,7 +13,7 @@ packaging==25.0
 pandas==2.2.3
 pathspec==0.12.1
 platformdirs==4.3.8
-preprocess-sentiment-analysis @ git+https://github.com/remla2025-team10/lib-ml.git@0228823108dc63b662f31a4538f426bdb8282064
+preprocess-sentiment-analysis @ git+https://github.com/remla2025-team10/lib-ml.git@main
 python-dateutil==2.9.0.post0
 pytz==2025.2
 PyYAML==6.0.2
